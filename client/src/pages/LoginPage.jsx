@@ -1,12 +1,12 @@
-import React, { useRef } from "react";
+import React from "react";
 import InputBox from "../components/input.component";
 import { FcGoogle } from "react-icons/fc";
 import { Toaster, toast } from "react-hot-toast";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import AnimationWrapper from "../common/page-animation";
 
 const LoginPage = () => {
-  const authForm = useRef();
   const userAuthThroughServer = (formData) => {
     axios
       .post(import.meta.env.VITE_SERVER_DOMAIN + "/signin", formData)
@@ -23,7 +23,7 @@ const LoginPage = () => {
 
     let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
-    let form = new FormData(authForm.current);
+    let form = new FormData(formElement);
     const formData = {};
     for (let [key, value] of form.entries()) {
       formData[key] = value;
@@ -55,7 +55,7 @@ const LoginPage = () => {
         <section className=" background   h-cover background  flex items-center justify-center">
           <Toaster />
           <form
-            ref={authForm}
+            id="formElement"
             className="w-[80%]  sm:hover:shadow-xl   border-0 sm:border px-4 py-6  rounded-xl border-black/20 max-w-[400px]"
           >
             <h1 className="text-4xl font-gelasio capitalize text-center mb-24 ">
@@ -90,6 +90,13 @@ const LoginPage = () => {
               Countinue With Google
               <FcGoogle className="text-2xl" />
             </button>
+
+            <p className="mt-4 flex gap-x-2 justify-center items-center ">
+              NewUser
+              <Link className="text underline" to="/signup">
+                Sing up here
+              </Link>
+            </p>
           </form>
         </section>
       </AnimationWrapper>
