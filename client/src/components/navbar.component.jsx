@@ -7,13 +7,13 @@ const Navbar = () => {
   const [searchBoxVisibility, setSearchBoxVisibility] = useState(false);
   return (
     <>
-      <nav className="navbar ">
+      <nav className="navbar background ">
         <Link className="flex-none w-10 font-bold text-xl  " herf="/">
           <img src={logo} alt="Icon" className="w-full" />
         </Link>
         {searchBoxVisibility ? (
           <div
-            className="absolute bg-white w-full left-0 top-full mt-0.5 border-b border-grey py-4 px-[5vw] md:border-0 md:block md:relative
+            className="absolute background  w-full left-0 top-full mt-0.5  py-4 px-[5vw]  md:block md:relative
                 md:inset-0 md:p-0 md:w-auto "
           >
             <input
