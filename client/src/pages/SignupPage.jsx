@@ -5,6 +5,7 @@ import { Toaster, toast } from "react-hot-toast";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import AnimationWrapper from "../common/page-animation";
+import { authWithGoogle } from "../common/firebase";
 
 const SignupPage = () => {
   const userAuthThroughServer = (formData) => {
@@ -50,6 +51,18 @@ const SignupPage = () => {
     userAuthThroughServer(formData);
     console.log(formData);
   };
+
+  const handleGoogleAuth = (e) => {
+    e.preventDefault();
+    authWithGoogle()
+      .then((user) => {
+        console.log(user);
+      })
+      .catch((err) => {
+        toast.error("Some Error occurred in googlelogin");
+        return console.log(err);
+      });
+  };
   return (
     <>
       <AnimationWrapper>
@@ -94,7 +107,10 @@ const SignupPage = () => {
               <hr className="w-1/2 border-black" />
               <hr className="w-1/2 border-black" />
             </div>
-            <button className="btn-dark w-full text-center gap-x-2 flex items-center justify-center ">
+            <button
+              onClick={handleGoogleAuth}
+              className="btn-dark w-full text-center gap-x-2 flex items-center justify-center "
+            >
               Countinue With Google
               <FcGoogle className="text-2xl" />
             </button>

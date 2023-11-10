@@ -1,21 +1,30 @@
-import React from "react";
+import React, { useContext } from "react";
 import InputBox from "../components/input.component";
 import { FcGoogle } from "react-icons/fc";
 import { Toaster, toast } from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import axios from "axios";
 import AnimationWrapper from "../common/page-animation";
+import { storeInSession } from "../common/session";
+import { UserContext } from "../App";
+import { authWithGoogle } from "../common/firebase";
 
 const LoginPage = () => {
+  let {
+    userAuth: { access_token },
+    setUserAuth,
+  } = useContext(UserContext);
+  console.log(access_token);
   const userAuthThroughServer = (formData) => {
     axios
       .post(import.meta.env.VITE_SERVER_DOMAIN + "/signin", formData)
       .then(({ data }) => {
-        console.log(data);
-        toast.success("Loged in successful");
+        storeInSession("user", JSON.stringify(data));
+        setUserAuth(data);
+        toast.success("Login successful");
       })
       .catch(({ response }) => {
-        toast.error(response.data.error);
+        toast.error("Incorrect Credentials");
       });
   };
   const handleSubmit = (e) => {
@@ -49,58 +58,77 @@ const LoginPage = () => {
     userAuthThroughServer(formData);
     console.log(formData);
   };
-  return (
-    <>
-      <AnimationWrapper>
-        <section className=" background   h-cover background  flex items-center justify-center">
-          <Toaster />
-          <form
-            id="formElement"
-            className="w-[80%]  sm:hover:shadow-xl   border-0 sm:border px-4 py-6  rounded-xl border-black/20 max-w-[400px]"
+
+  const handleGoogleAuth = (e) => {
+    e.preventDefault();
+    authWithGoogle()
+      .then((user) => {
+        let formData = {
+          access_token: user.accessToken,
+        };
+        userAuthThroughServer("/google-auth", formData);
+      })
+      .catch((err) => {
+        toast.error("Some Error occurred in googlelogin");
+        return console.log(err);
+      });
+  };
+
+  return access_token ? (
+    <Navigate to="/" />
+  ) : (
+    <AnimationWrapper>
+      <section className=" background   h-cover background  flex items-center justify-center">
+        <Toaster />
+        <form
+          id="formElement"
+          className="w-[80%]  sm:hover:shadow-xl   border-0 sm:border px-4 py-6  rounded-xl border-black/20 max-w-[400px]"
+        >
+          <h1 className="text-4xl font-gelasio capitalize text-center mb-24 ">
+            Welcome Back
+          </h1>
+
+          <InputBox
+            name="email"
+            type="text"
+            placeholder="Email"
+            icon="fi-rr-envelope"
+          />
+          <InputBox
+            name="password"
+            type="password"
+            placeholder="Password"
+            icon="fi-rr-key"
+          />
+          <button
+            type="submit"
+            onClick={handleSubmit}
+            className="btn-dark w-full center mt-14 "
           >
-            <h1 className="text-4xl font-gelasio capitalize text-center mb-24 ">
-              Welcome Back
-            </h1>
+            Login
+          </button>
 
-            <InputBox
-              name="email"
-              type="text"
-              placeholder="Email"
-              icon="fi-rr-envelope"
-            />
-            <InputBox
-              name="password"
-              type="password"
-              placeholder="Password"
-              icon="fi-rr-key"
-            />
-            <button
-              type="submit"
-              onClick={handleSubmit}
-              className="btn-dark w-full center mt-14 "
-            >
-              Login
-            </button>
+          <div className="relative w-full flex items-center gap-2 my-10 opacity-10 uppercase text-black font-bold ">
+            <hr className="w-1/2 border-black" />
+            <hr className="w-1/2 border-black" />
+          </div>
+          <button
+            onClick={handleGoogleAuth}
+            className="btn-dark w-full text-center gap-x-2 flex items-center justify-center "
+          >
+            Countinue With Google
+            <FcGoogle className="text-2xl" />
+          </button>
 
-            <div className="relative w-full flex items-center gap-2 my-10 opacity-10 uppercase text-black font-bold ">
-              <hr className="w-1/2 border-black" />
-              <hr className="w-1/2 border-black" />
-            </div>
-            <button className="btn-dark w-full text-center gap-x-2 flex items-center justify-center ">
-              Countinue With Google
-              <FcGoogle className="text-2xl" />
-            </button>
-
-            <p className="mt-4 flex gap-x-2 justify-center items-center ">
-              NewUser
-              <Link className="text underline" to="/signup">
-                Sing up here
-              </Link>
-            </p>
-          </form>
-        </section>
-      </AnimationWrapper>
-    </>
+          <p className="mt-4 flex gap-x-2 justify-center items-center ">
+            NewUser
+            <Link className="text underline" to="/signup">
+              Sing up here
+            </Link>
+          </p>
+        </form>
+      </section>
+    </AnimationWrapper>
   );
 };
 
