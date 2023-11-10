@@ -1,4 +1,4 @@
-import express from "express";
+import express, { response } from "express";
 import mongoose from "mongoose";
 import "dotenv/config";
 import bcrypt from "bcrypt";
@@ -38,6 +38,7 @@ const generateUsername = async (email) => {
   return username;
 };
 
+// Sign up Part is here
 server.post("/signup", (req, res) => {
   const { fullname, email, password } = req.body;
   if (fullname?.length < 3) {
@@ -76,6 +77,38 @@ server.post("/signup", (req, res) => {
     console.log(hashe_password);
   });
   // return res.status(200).json({ status: "ok" });
+});
+
+//Singin part will goes here
+
+server.post("/signin", (req, res) => {
+  let { email, password } = req.body;
+
+  User.findOne({ "personal_info.email": email })
+    .then((user) => {
+      if (!user) {
+        return res.status(403).json({ error: "Email not found" });
+      }
+      bcrypt.compare(password, user.personal_info.password, (err, result) => {
+        if (err) {
+          return res
+            .status(403)
+            .json({ status: "Error accured while login (try again)" });
+        }
+        if(!result){
+           return res.status(403).json({ status: "Incorrect Password"})
+        }else {
+          return res.status(200).json(formatDatatoSend(user))
+        }
+
+      });
+      console.log(user);
+      // return res.json({ status: "Wohoo😊 got the user" });
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.status(500).json({ error: err.message });
+    });
 });
 
 server.listen(PORT, () => {
