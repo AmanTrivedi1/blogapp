@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { AiOutlineSearch } from "react-icons/ai";
 import { BsPencilFill } from "react-icons/bs";
 import logo from "../imgs/logo.png";
@@ -47,7 +47,6 @@ const Navbar = () => {
           </Link>
         </div>
       </nav>
-      <Outlet />
     </>
   );
 };
