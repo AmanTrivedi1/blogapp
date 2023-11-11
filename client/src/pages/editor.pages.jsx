@@ -5,10 +5,11 @@ import BlogEditor from "../components/blog-editor.component";
 import PublishForm from "../components/publish-form.component";
 
 const blogStructure = {
-  titile: "",
+  title: "",
   banner: "",
   content: [],
   tags: [],
+  des: "",
   author: { personal_info: {} },
 };
 

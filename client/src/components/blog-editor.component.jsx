@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../imgs/logo.png";
 import { Toaster, toast } from "react-hot-toast";
 import Banner from "../imgs/blog banner.png";
@@ -8,8 +8,12 @@ import { uploadImage } from "../common/aws";
 import { EditorContext } from "../pages/editor.pages";
 import EditorJS from "@editorjs/editorjs";
 import { tools } from "./tools.component";
+import axios from "axios";
+import { UserContext } from "../App";
 
 const BlogEditor = () => {
+  let navigate = useNavigate();
+
   let {
     blog,
     blog: { title, banner, content, tags, des },
@@ -20,14 +24,16 @@ const BlogEditor = () => {
   } = useContext(EditorContext);
 
   useEffect(() => {
-    setTextEditor(
-      new EditorJS({
-        holderId: "textEditor",
-        data: "",
-        tools: tools,
-        placeholder: "Lets write awesom Story",
-      })
-    );
+    if (!textEditor.isReady) {
+      setTextEditor(
+        new EditorJS({
+          holderId: "textEditor",
+          data: content,
+          tools: tools,
+          placeholder: "Lets write awesom Story",
+        })
+      );
+    }
   }, []);
 
   console.log(blog);
@@ -69,27 +75,74 @@ const BlogEditor = () => {
     img.src = Banner;
   };
 
+  let {
+    userAuth: { access_token },
+  } = useContext(UserContext);
+
   const handlePublishEvent = () => {
-    if (!banner?.length) {
-      return toast.error("Fill the Blog banner");
+    // if (!banner?.length) {
+    //   return toast.error("Fill the Blog banner");
+    // }
+    // if (!title?.length) {
+    //   return toast.error("Fill the Blog Title");
+    // }
+    // if (textEditor.isReady) {
+    textEditor
+      .save()
+      .then((data) => {
+        // if (data?.blocks.length) {
+        setBlog({ ...blog, content: data });
+        setEditorState("publish");
+        // } else {
+        //   toast.error("Write Something in your blog");
+        // }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    // }
+  };
+
+  const handleDraft = (e) => {
+    if (e.target.className.includes("disable")) {
+      return;
     }
     if (!title?.length) {
-      return toast.error("Fill the Blog Title");
+      return toast.error("Write Blog title before saving it as a draft...");
     }
+    let loadingToast = toast.loading("Saving you draft ...");
+    e.target.classList.add("disable");
+
     if (textEditor.isReady) {
-      textEditor
-        .save()
-        .then((data) => {
-          if (data?.blocks.length) {
-            setBlog({ ...blog, content: data });
-            setEditorState("publish");
-          } else {
-            toast.error("Write Something in your blog");
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      textEditor.save().then((content) => {
+        let blogObj = {
+          title,
+          banner,
+          des,
+          content,
+          tags,
+          draft: true,
+        };
+        axios
+          .post(import.meta.env.VITE_SERVER_DOMAIN + "/create-blog", blogObj, {
+            headers: {
+              Authorization: `Bearer ${access_token} `,
+            },
+          })
+          .then(() => {
+            e.target.classList.remove("disable");
+            toast.dismiss(loadingToast);
+            toast.success("Wo hooo blog is Saved👍");
+            setTimeout(() => {
+              navigate("/");
+            }, 500);
+          })
+          .catch(({ response }) => {
+            e.target.classList.remove("disable");
+            toast.dismiss(loadingToast);
+            return toast.error(response.data.error);
+          });
+      });
     }
   };
 
@@ -107,7 +160,9 @@ const BlogEditor = () => {
           <button className="btn-dark py-2  " onClick={handlePublishEvent}>
             Publish
           </button>
-          <button className="btn-light py-2">Draft</button>
+          <button onClick={handleDraft} className="btn-light py-2">
+            Draft
+          </button>
         </div>
       </nav>
       <AnimationWrapper>
@@ -133,13 +188,13 @@ const BlogEditor = () => {
           </div>
 
           <textarea
+            defaultValue={title}
             className="text-3xl mt-10 leading-tight placeholder:opacity-60
              font-medium w-full h-20 outline-none resize-none"
             placeholder="Blog Title"
             onKeyDown={handleTitleKeydown}
             onChange={handleTitleChange}
           ></textarea>
-
           <hr className="w-full opacity-10 my-5" />
           <div id="textEditor" className="font-gelasio "></div>
         </section>
