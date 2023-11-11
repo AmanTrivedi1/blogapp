@@ -9,6 +9,7 @@ import cors from "cors";
 import { getAuth } from "firebase-admin/auth";
 import admin from "firebase-admin";
 import serviceAccount from "./blogapp-bdcc8-firebase-adminsdk-4ypai-c44e56c9da.json" assert { type: "json" };
+import aws from "aws-sdk";
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -25,6 +26,26 @@ server.use(cors());
 mongoose.connect(process.env.DB_LOCATION, {
   autoIndex: true,
 });
+
+// Setting up S3 bucket
+
+const s3 = new aws.S3({
+  region: "ap-south-1",
+  accessKeyId: process.env.AWS_ACCESS_KEY,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+});
+
+const generateUploadURL = async () => {
+  const date = new Date();
+  const imageName = `${nanoid()}-${date.getTime()}.jpeg`;
+
+  return await s3.getSignedUrlPromise("putObject", {
+    Bucket: "writeblogapp",
+    Key: imageName,
+    Expires: 1000,
+    ContentType: "image/jpeg",
+  });
+};
 
 const formatDatatoSend = (user) => {
   const access_token = jwt.sign(
@@ -49,6 +70,16 @@ const generateUsername = async (email) => {
   isUsernameNotUnique ? (username += nanoid().substring(0, 4)) : "";
   return username;
 };
+
+//Upload image url Route
+server.get("/get-upload-url", (req, res) => {
+  generateUploadURL()
+    .then((url) => res.status(200).json({ uploadURL: url }))
+    .catch((err) => {
+      console.log(err.message);
+      return res.status(500).json({ error: err.message });
+    });
+});
 
 // Sign up Part is here
 server.post("/signup", (req, res) => {
@@ -116,11 +147,9 @@ server.post("/signin", (req, res) => {
           }
         });
       } else {
-        return res
-          .status(403)
-          .json({
-            status: "Account was Created via Google try to login via a google",
-          });
+        return res.status(403).json({
+          status: "Account was Created via Google try to login via a google",
+        });
       }
 
       console.log(user);

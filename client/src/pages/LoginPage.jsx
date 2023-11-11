@@ -113,6 +113,7 @@ const LoginPage = () => {
             <hr className="w-1/2 border-black" />
           </div>
           <button
+            disabled
             onClick={handleGoogleAuth}
             className="btn-dark w-full text-center gap-x-2 flex items-center justify-center "
           >

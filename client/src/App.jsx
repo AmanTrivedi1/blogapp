@@ -1,10 +1,11 @@
 import Navbar from "./components/navbar.component";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import { createContext, useEffect, useState } from "react";
 import { lookInSession } from "./common/session";
+import Editor from "./pages/editor.pages";
 
 export const UserContext = createContext({});
 
@@ -21,13 +22,12 @@ const App = () => {
   return (
     <>
       <UserContext.Provider value={{ userAuth, setUserAuth }}>
-        <Router>
-          <Navbar />
-          <Routes>
-            <Route path="/signin" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} />
-          </Routes>
-        </Router>
+        <Routes>
+          <Route path="/editor" element={<Editor />} />
+          <Route path="/" element={<Navbar />} />
+          <Route path="/signin" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+        </Routes>
       </UserContext.Provider>
     </>
   );
