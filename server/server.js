@@ -229,6 +229,103 @@ server.post("/google-auth", async (req, res) => {
     });
 });
 
+// For getting the all blogs post
+
+server.post("/latest-blogs", (req, res) => {
+  let { page } = req.body;
+  let maxLimit = 5;
+  Blog.find({ draft: false })
+    .populate(
+      "author",
+      "personal_info.profile_img , personal_info.username , personal_info.fullname , -_id"
+    )
+    .sort({ publishedAt: -1 })
+    .select("blog_id title des banner activity tags publishedAt -_id")
+    .skip((page - 1) * maxLimit)
+    .limit(maxLimit)
+    .then((blogs) => {
+      return res.status(200).json({ blogs });
+    })
+    .catch((err) => {
+      return res.status(500).json({ error: err.message });
+    });
+});
+
+server.post("/all-latest-blogs-count", (req, res) => {
+  Blog.countDocuments({ draft: false })
+    .then((count) => {
+      return res.status(200).json({ totalDocs: count });
+    })
+    .catch((err) => {
+      console.log(err.message);
+      return res.status(500).json({ error: err.message });
+    });
+});
+
+server.get("/trending-blogs", (req, res) => {
+  let maxLimit = 5;
+  Blog.find({ draft: false })
+    .populate(
+      "author",
+      "personal_info.profile_img , personal_info.username , personal_info.fullname , -_id"
+    )
+    .sort({
+      "activity.total_reads": -1,
+      "activity.total_likes": -1,
+      publishedAt: -1,
+    })
+    .select("blog_id  title publishedAt -_id")
+    .limit(maxLimit)
+    .then((blogs) => {
+      return res.status(200).json({ blogs });
+    })
+    .catch((err) => {
+      return res.status(500).json({ error: err.message });
+    });
+});
+
+//  Get the blog by category search functionality
+
+server.post("/search-blogs", (req, res) => {
+  let { tag, page } = req.body;
+  let findQuery = {
+    tags: tag,
+    draft: false,
+  };
+
+  let maxLimit = 2;
+
+  Blog.find(findQuery)
+    .populate(
+      "author",
+      "personal_info.profile_img , personal_info.username , personal_info.fullname , -_id"
+    )
+    .sort({ publishedAt: -1 })
+    .select("blog_id title des banner activity tags publishedAt -_id")
+    .skip((page - 1) * maxLimit)
+    .limit(maxLimit)
+    .then((blogs) => {
+      return res.status(200).json({ blogs });
+    })
+    .catch((err) => {
+      return res.status(500).json({ error: err.message });
+    });
+});
+
+server.post("/search-blogs-count", (req, res) => {
+  let { tag } = req.body;
+  let findQuery = { tags: tag, draft: false };
+
+  Blog.countDocuments(findQuery)
+    .then((count) => {
+      return res.status(200).json({ totalDocs: count });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({ error: err.message });
+    });
+});
+
 // For Creating the post
 
 server.post("/create-blog", vefifyJWT, (req, res) => {
@@ -249,7 +346,7 @@ server.post("/create-blog", vefifyJWT, (req, res) => {
         .status(403)
         .json({ error: "You must provide some content to publish" });
     }
-    if (!tags?.length || tags?.length > 10) {
+    if (!tags.length) {
       return res
         .status(403)
         .json({ error: "You Should provides some tags under limit 10" });
@@ -259,10 +356,8 @@ server.post("/create-blog", vefifyJWT, (req, res) => {
   if (!title?.length) {
     return res.status(403).json({ error: "You must provide a title" });
   }
+  tags = tags.map((tag) => tag.toLowerCase());
 
-  tags = tags.map((tag) => {
-    tag.toLowerCase();
-  });
   let blog_id =
     title
       .replace(/[^a-zA-Z0-9]/g, " ")

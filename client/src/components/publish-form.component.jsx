@@ -74,7 +74,6 @@ const PublishForm = () => {
       return toast.error(`PLease add atleast 1 tag out of ${taglimit}  `);
     }
     let loadingToast = toast.loading("Magic is happening...");
-
     e.target.classList.add("disable");
 
     let blogObj = {

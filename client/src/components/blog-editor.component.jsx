@@ -80,27 +80,27 @@ const BlogEditor = () => {
   } = useContext(UserContext);
 
   const handlePublishEvent = () => {
-    // if (!banner?.length) {
-    //   return toast.error("Fill the Blog banner");
-    // }
-    // if (!title?.length) {
-    //   return toast.error("Fill the Blog Title");
-    // }
-    // if (textEditor.isReady) {
-    textEditor
-      .save()
-      .then((data) => {
-        // if (data?.blocks.length) {
-        setBlog({ ...blog, content: data });
-        setEditorState("publish");
-        // } else {
-        //   toast.error("Write Something in your blog");
-        // }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    // }
+    if (!banner?.length) {
+      return toast.error("Fill the Blog banner");
+    }
+    if (!title?.length) {
+      return toast.error("Fill the Blog Title");
+    }
+    if (textEditor.isReady) {
+      textEditor
+        .save()
+        .then((data) => {
+          if (data?.blocks?.length) {
+            setBlog({ ...blog, content: data });
+            setEditorState("publish");
+          } else {
+            toast.error("Write Something in your blog");
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   };
 
   const handleDraft = (e) => {
