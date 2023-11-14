@@ -137,7 +137,9 @@ const Homepage = () => {
                 )}
                 <LoadMoreDataBtn
                   state={blogs}
-                  fetchDataFun={fetchLatestBlogs}
+                  fetchDataFun={
+                    pageState == "home" ? fetchLatestBlogs : fetcBlogByCategory
+                  }
                 />
               </>
 

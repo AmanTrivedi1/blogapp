@@ -7,6 +7,8 @@ import { createContext, useEffect, useState } from "react";
 import { lookInSession } from "./common/session";
 import Editor from "./pages/editor.pages";
 import Homepage from "./pages/home.page";
+import SeacrhPage from "./pages/search.page";
+import NotFound from "./pages/404.page";
 
 export const UserContext = createContext({});
 
@@ -30,6 +32,8 @@ const App = () => {
             <Route index element={<Homepage />} />
             <Route path="/signin" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
+            <Route path="search/:query" element={<SeacrhPage />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>
       </UserContext.Provider>
