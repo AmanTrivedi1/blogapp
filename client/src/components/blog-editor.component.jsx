@@ -1,8 +1,8 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../imgs/logo.png";
 import { Toaster, toast } from "react-hot-toast";
-import Banner from "../imgs/blog banner.png";
+// import Banner from "../imgs/blog banner.";
 import AnimationWrapper from "../common/page-animation";
 import { uploadImage } from "../common/aws";
 import { EditorContext } from "../pages/editor.pages";
@@ -14,6 +14,44 @@ import { UserContext } from "../App";
 const BlogEditor = () => {
   let navigate = useNavigate();
 
+  const [bannerimg, setBannerImg] = useState("");
+  const [isRandomImageFetched, setIsRandomImageFetched] = useState(false);
+  const PEXELS_API_KEY = import.meta.env.VITE_PEXELS_API_KEY;
+
+  const getRandomImage = async () => {
+    try {
+      const response = await axios.get("https://api.pexels.com/v1/curated", {
+        headers: {
+          Authorization: PEXELS_API_KEY,
+        },
+      });
+
+      if (response.data.photos && response.data.photos.length > 0) {
+        const randomIndex = Math.floor(
+          Math.random() * response.data.photos.length
+        );
+        const randomImage = response.data.photos[randomIndex];
+
+        const imageUrl = randomImage.src.original;
+        return imageUrl;
+      } else {
+        throw new Error("No photos found in the Pexels response.");
+      }
+    } catch (error) {
+      console.error("Error fetching random image:", error.message);
+      return null;
+    }
+  };
+
+  getRandomImage().then((Banner) => {
+    if (Banner) {
+      setBannerImg(Banner);
+      console.log("Random image URL:", Banner);
+    } else {
+      console.log("Unable to fetch a random image.");
+    }
+  });
+
   let {
     blog,
     blog: { title, banner, content, tags, des },
@@ -22,6 +60,12 @@ const BlogEditor = () => {
     setTextEditor,
     setEditorState,
   } = useContext(EditorContext);
+
+  useEffect(() => {
+    if (!isRandomImageFetched) {
+      getRandomImage();
+    }
+  }, [isRandomImageFetched]);
 
   useEffect(() => {
     if (!textEditor.isReady) {
@@ -72,7 +116,7 @@ const BlogEditor = () => {
 
   const handleError = (e) => {
     let img = e.target;
-    img.src = Banner;
+    img.src = bannerimg;
   };
 
   let {
@@ -168,12 +212,15 @@ const BlogEditor = () => {
       <AnimationWrapper>
         <section>
           <div className="mx-auto max-w-[900px] w-full">
-            <div className="relative border-dotted aspect-video rounded-xl hover:opacity-80 bg-white border-4 border-grey/70">
+            <div className="relative border-dotted aspect-video rounded-xl hover:opacity-90 hover:cursor-pointer bg-white border-4 border-black/20">
               <label htmlFor="uploadBanner">
+                <h1 className="absolute font-bold text-white top-[10px] left-[14px] ">
+                  Dummy Image Upload Yours
+                </h1>
                 <img
                   src={banner}
                   alt="/banner"
-                  className="z-20"
+                  className="z-20 rounded-2xl p-2"
                   onError={handleError}
                 />
                 <input
@@ -185,16 +232,16 @@ const BlogEditor = () => {
                 />
               </label>
             </div>
+            <textarea
+              defaultValue={title}
+              className="text-3xl mt-10 leading-tight placeholder:opacity-60
+             font-medium w-full h-20 outline-none resize-none"
+              placeholder="Blog Title"
+              onKeyDown={handleTitleKeydown}
+              onChange={handleTitleChange}
+            ></textarea>
           </div>
 
-          <textarea
-            defaultValue={title}
-            className="text-3xl mt-10 leading-tight placeholder:opacity-60
-             font-medium w-full h-20 outline-none resize-none"
-            placeholder="Blog Title"
-            onKeyDown={handleTitleKeydown}
-            onChange={handleTitleChange}
-          ></textarea>
           <hr className="w-full opacity-10 my-5" />
           <div id="textEditor" className="font-gelasio "></div>
         </section>

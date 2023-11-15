@@ -8,6 +8,7 @@ import AnimationWrapper from "../common/page-animation";
 import { storeInSession } from "../common/session";
 import { UserContext } from "../App";
 import { authWithGoogle } from "../common/firebase";
+import Navbar from "../components/navbar.component";
 
 const LoginPage = () => {
   let {
@@ -77,59 +78,62 @@ const LoginPage = () => {
   return access_token ? (
     <Navigate to="/" />
   ) : (
-    <AnimationWrapper>
-      <section className=" background   h-cover background  flex items-center justify-center">
-        <Toaster />
-        <form
-          id="formElement"
-          className="w-[80%]  sm:hover:shadow-xl   border-0 sm:border px-4 py-6  rounded-xl border-black/20 max-w-[400px]"
-        >
-          <h1 className="text-4xl font-gelasio capitalize text-center mb-24 ">
-            Welcome Back
-          </h1>
-
-          <InputBox
-            name="email"
-            type="text"
-            placeholder="Email"
-            icon="fi-rr-envelope"
-          />
-          <InputBox
-            name="password"
-            type="password"
-            placeholder="Password"
-            icon="fi-rr-key"
-          />
-          <button
-            type="submit"
-            onClick={handleSubmit}
-            className="btn-dark w-full center mt-14 "
+    <>
+      <Navbar />
+      <AnimationWrapper>
+        <section className=" background   h-cover background  flex items-center justify-center">
+          <Toaster />
+          <form
+            id="formElement"
+            className="w-[80%]  sm:hover:shadow-xl   border-0 sm:border px-4 py-6  rounded-xl border-black/20 max-w-[400px]"
           >
-            Login
-          </button>
+            <h1 className="text-4xl font-gelasio capitalize text-center mb-24 ">
+              Welcome Back
+            </h1>
 
-          <div className="relative w-full flex items-center gap-2 my-10 opacity-10 uppercase text-black font-bold ">
-            <hr className="w-1/2 border-black" />
-            <hr className="w-1/2 border-black" />
-          </div>
-          <button
-            disabled
-            onClick={handleGoogleAuth}
-            className="btn-dark w-full text-center gap-x-2 flex items-center justify-center "
-          >
-            Countinue With Google
-            <FcGoogle className="text-2xl" />
-          </button>
+            <InputBox
+              name="email"
+              type="text"
+              placeholder="Email"
+              icon="fi-rr-envelope"
+            />
+            <InputBox
+              name="password"
+              type="password"
+              placeholder="Password"
+              icon="fi-rr-key"
+            />
+            <button
+              type="submit"
+              onClick={handleSubmit}
+              className="btn-dark w-full center mt-14 "
+            >
+              Login
+            </button>
 
-          <p className="mt-4 flex gap-x-2 justify-center items-center ">
-            NewUser
-            <Link className="text underline" to="/signup">
-              Sing up here
-            </Link>
-          </p>
-        </form>
-      </section>
-    </AnimationWrapper>
+            <div className="relative w-full flex items-center gap-2 my-10 opacity-10 uppercase text-black font-bold ">
+              <hr className="w-1/2 border-black" />
+              <hr className="w-1/2 border-black" />
+            </div>
+            <button
+              disabled
+              onClick={handleGoogleAuth}
+              className="btn-dark w-full text-center gap-x-2 flex items-center justify-center "
+            >
+              Countinue With Google
+              <FcGoogle className="text-2xl" />
+            </button>
+
+            <p className="mt-4 flex gap-x-2 justify-center items-center ">
+              NewUser
+              <Link className="text underline" to="/signup">
+                Sing up here
+              </Link>
+            </p>
+          </form>
+        </section>
+      </AnimationWrapper>
+    </>
   );
 };
 

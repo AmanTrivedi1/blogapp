@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import AnimationWrapper from "../common/page-animation";
 import { authWithGoogle } from "../common/firebase";
+import Navbar from "../components/navbar.component";
 
 const SignupPage = () => {
   const userAuthThroughServer = (formData) => {
@@ -65,6 +66,7 @@ const SignupPage = () => {
   };
   return (
     <>
+      <Navbar />
       <AnimationWrapper>
         <section className=" background   h-cover background  flex items-center justify-center">
           <Toaster />
