@@ -118,7 +118,7 @@ const SeacrhPage = () => {
             <UserCardWrapper />
           </InPageNavigation>
         </div>
-        <div className="min-w-[40%] lg:min-w-[350px] max-w-min border-l border-grey pl-8 pt-3 max-md:hodden">
+        <div className="min-w-[40%] lg:min-w-[350px] max-w-min border-l border-grey pl-8 pt-3 hidden md:block">
           <h1 className="font-medium text-xl mb-8">User Realted to search</h1>
           <UserCardWrapper />
         </div>

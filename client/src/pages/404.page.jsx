@@ -1,6 +1,7 @@
 import React from "react";
 import AnimationWrapper from "../common/page-animation";
-import Pagenotfound from "../imgs/404.png";
+
+import Logo from "../imgs/logo.png";
 import { Link } from "react-router-dom";
 const NotFound = () => {
   return (
@@ -16,6 +17,16 @@ const NotFound = () => {
           <Link to="/" className="btn-dark">
             Go home
           </Link>
+
+          <div className="flex mt-20 items-center flex-col justify-center">
+            <img
+              className="h-8 object-contain block mx-auto select-none"
+              src={Logo}
+              alt="logo"
+            />
+            <p className="text-2xl font-bold">Blogapp</p>
+            <p>Millions of story we read here</p>
+          </div>
         </div>
       </AnimationWrapper>
     </>
