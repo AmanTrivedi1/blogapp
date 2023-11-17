@@ -35,6 +35,7 @@ const App = () => {
             <Route path="/signup" element={<SignupPage />} />
             <Route path="search/:query" element={<SeacrhPage />} />
             <Route path="user/:id" element={<ProfilePage />} />
+            <Route path="blog/:blog_id" element={<h1>Hello i am Blogiing app</h1>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>

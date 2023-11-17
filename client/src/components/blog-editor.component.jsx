@@ -31,7 +31,6 @@ const BlogEditor = () => {
           Math.random() * response.data.photos.length
         );
         const randomImage = response.data.photos[randomIndex];
-
         const imageUrl = randomImage.src.original;
         return imageUrl;
       } else {
@@ -90,7 +89,7 @@ const BlogEditor = () => {
         .then((url) => {
           if (url) {
             toast.dismiss(loadingToast);
-            toast.success("Uploaded👍");
+            toast.success("Uploaded 👍");
             setBlog({ ...blog, banner: url });
           }
         })
@@ -214,7 +213,7 @@ const BlogEditor = () => {
           <div className="mx-auto max-w-[900px] w-full">
             <div className="relative border-dotted aspect-video rounded-xl hover:opacity-90 hover:cursor-pointer bg-white border-4 border-black/20">
               <label htmlFor="uploadBanner">
-                <h1 className="absolute font-bold text-white top-[10px] left-[14px] ">
+                <h1 className="absolute font-bold bg-dark-grey p-1 rounded-md mt-2 text-white top-[10px] left-[14px] ">
                   Dummy Image Upload Yours
                 </h1>
                 <img

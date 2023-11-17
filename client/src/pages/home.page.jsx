@@ -23,7 +23,6 @@ const Homepage = () => {
     "social media",
     "cooking",
     "reactjs",
-    "sonam",
   ];
 
   const fetchLatestBlogs = ({ page = 1 }) => {
