@@ -65,7 +65,7 @@ const LoginPage = () => {
     authWithGoogle()
       .then((user) => {
         let formData = {
-          access_token: user.accessToken,
+          access_token: user?.accessToken,
         };
         userAuthThroughServer("/google-auth", formData);
       })

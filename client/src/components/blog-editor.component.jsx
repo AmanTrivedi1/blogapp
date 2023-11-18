@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../imgs/logo.png";
 import { Toaster, toast } from "react-hot-toast";
-// import Banner from "../imgs/blog banner.";
 import AnimationWrapper from "../common/page-animation";
 import { uploadImage } from "../common/aws";
 import { EditorContext } from "../pages/editor.pages";

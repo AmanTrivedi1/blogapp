@@ -1,11 +1,14 @@
 import axios from "axios";
 import React, { createContext, useEffect, useState } from "react";
+import { FaArrowLeft } from "react-icons/fa";
+
 import { Link, useParams } from "react-router-dom";
 import AnimationWrapper from "../common/page-animation";
 import Loader from "../components/loader.component";
 import { getDay } from "../common/date";
 import BlogInteraction from "../components/blog-interaction.component";
 import BlogPostCard from "../components/blog-post.component";
+import BlogContent from "../components/blog-content.component";
 
 export const blogStructure = {
   title: " ",
@@ -78,7 +81,13 @@ const BlogPage = () => {
           <Loader />
         ) : (
           <BlogContext.Provider value={{ blog, setBlog }}>
-            <div className="bg-[#212121]">
+            <div className="bg-[#212121] min-h-screen">
+              <Link
+                className=" absolute top-10   p-2 rounded-full text-white/40  mt-5  left-10"
+                to="/"
+              >
+                <FaArrowLeft />
+              </Link>
               <div className="max-w-[900px] text-white center py-10 max-lg:px-[5vw] ">
                 <img
                   src={banner}
@@ -86,7 +95,9 @@ const BlogPage = () => {
                   alt="banner img"
                 />
                 <div className="mt-12 ">
-                  <h1 className="capitalize text-white text-3xl">{title}</h1>
+                  <h1 className="capitalize text-white text-3xl line-clamp-2 ">
+                    {title}
+                  </h1>
                   <div className="flex max-sm:flex-col justify-between my-8 ">
                     <div className="flex items-center gap-5  ">
                       <img
@@ -94,21 +105,36 @@ const BlogPage = () => {
                         src={profile_img}
                         alt="profileimage"
                       />
-                      <p className="text-white capitalize">{fullname}</p>
+                      <p className="text-white capitalize line-clamp-1">
+                        {fullname}
+                      </p>
                       <br />
                       <Link
-                        className="text-white/50 underline "
+                        className="text-white/50 underline line-clamp-1 "
                         to={`/user/${author_username}`}
                       >
                         @{author_username}
                       </Link>
                     </div>
                   </div>
-                  <p className="text-dark-grey opacity-90 max-sm:mt-6 max-sm:ml-12 max-sm:pl-5 ">
+                  <p className="text-dark-grey opacity-90  max-sm:mt-6 max-sm:ml-12 max-sm:pl-5 ">
                     Published on {getDay(publishedAt)}
                   </p>
                 </div>
                 <BlogInteraction />
+
+                <div className="my-12 blog-page-content">
+                  {content[0].blocks.map((block, i) => {
+                    return (
+                      <div className="my-4 md:my-8 " key={i}>
+                        <BlogContent block={block} />
+                      </div>
+                    );
+                  })}
+                </div>
+                <h1 className="text-3xl font-bold mb-10 mt-20 text-white">
+                  Similar Blog's
+                </h1>
                 {similarBlog != null && similarBlog.length ? (
                   <>
                     {similarBlog.map((blog, i) => {
