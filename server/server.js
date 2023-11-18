@@ -287,18 +287,19 @@ server.get("/trending-blogs", (req, res) => {
 //  Get the blog by category search functionality
 
 server.post("/search-blogs", (req, res) => {
-  let { tag, query, author, page } = req.body;
+  let { tag, query, author, page, limit, eliminate_blog } = req.body;
+
   let findQuery;
 
   if (tag) {
-    findQuery = { tags: tag, draft: false };
+    findQuery = { tags: tag, draft: false, blog_id: { $ne: eliminate_blog } };
   } else if (query) {
     findQuery = { draft: false, title: new RegExp(query, "i") };
   } else if (author) {
     findQuery = { author, draft: false };
   }
 
-  let maxLimit = 2;
+  let maxLimit = limit ? limit : 2;
 
   Blog.find(findQuery)
     .populate(
@@ -446,7 +447,35 @@ server.post("/create-blog", vefifyJWT, (req, res) => {
     });
 });
 
-// acess token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1NGZkNTE4ZDU2NTg1NGNjMzA0ZDNiYiIsImlhdCI6MTY5OTczMDcxMn0.uZWmwu9ET9g2Pfvt-XfIq827Vg0vJuNXT_d3exDsVa8
+server.post("/get-blog", (req, res) => {
+  let { blog_id } = req.body;
+  let incrementval = 1;
+  Blog.findOneAndUpdate(
+    { blog_id },
+    { $inc: { "activity.total_reads": incrementval } }
+  )
+    .populate(
+      "author",
+      "personal_info.fullname personal_info.username personal_info.profile_img"
+    )
+    .select("title  des content activity publishedAt blog_id tags banner")
+    .then((blog) => {
+      User.findOneAndUpdate(
+        {
+          "personal_info.username": blog.author.personal_info.username,
+        },
+        {
+          $inc: { "account_info.total_reads": incrementval },
+        }
+      ).catch((err) => {
+        return res.status(500).json({ error: err.message });
+      });
+      return res.status(200).json({ blog });
+    })
+    .catch((err) => {
+      return res.status(500).json({ error: err.message });
+    });
+});
 server.listen(PORT, () => {
   console.log("Listening on port wohooooo😄 ->", +PORT);
 });
