@@ -7,8 +7,9 @@ import AnimationWrapper from "../common/page-animation";
 import Loader from "../components/loader.component";
 import { getDay } from "../common/date";
 import BlogInteraction from "../components/blog-interaction.component";
-import BlogPostCard from "../components/blog-post.component";
+
 import BlogContent from "../components/blog-content.component";
+import RelateBlogCard from "../components/related-blogcomponent";
 
 export const blogStructure = {
   title: " ",
@@ -136,7 +137,7 @@ const BlogPage = () => {
                   Similar Blog's
                 </h1>
                 {similarBlog != null && similarBlog.length ? (
-                  <>
+                  <div className="flex flex-wrap gap-2 justify-center sm:justify-start items-center  ">
                     {similarBlog.map((blog, i) => {
                       let {
                         author: { personal_info },
@@ -146,11 +147,16 @@ const BlogPage = () => {
                           key={i}
                           transition={{ duration: 1, delay: i * 0.08 }}
                         >
-                          <BlogPostCard content={blog} auther={personal_info} />
+                          <div className="">
+                            <RelateBlogCard
+                              content={blog}
+                              auther={personal_info}
+                            />
+                          </div>
                         </AnimationWrapper>
                       );
                     })}
-                  </>
+                  </div>
                 ) : (
                   <></>
                 )}
