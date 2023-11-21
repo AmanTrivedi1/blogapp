@@ -4,6 +4,7 @@ import "dotenv/config";
 import bcrypt from "bcrypt";
 import User from "./Schema/User.js";
 import Blog from "./Schema/Blog.js";
+import Notification from "./Schema/Notification.js";
 import { nanoid } from "nanoid";
 import jwt from "jsonwebtoken";
 import cors from "cors";
@@ -373,7 +374,11 @@ server.post("/get-profile", (req, res) => {
 
 server.post("/create-blog", vefifyJWT, (req, res) => {
   let authorId = req.user;
-  let { title, des, banner, tags, content, draft } = req.body;
+  let { title, des, banner, tags, content, draft, id } = req.body;
+
+  if (!title?.length) {
+    return res.status(403).json({ error: "You must provide a title" });
+  }
 
   if (!draft) {
     if (!des?.length || des?.length > 200) {
@@ -396,60 +401,72 @@ server.post("/create-blog", vefifyJWT, (req, res) => {
     }
   }
 
-  if (!title?.length) {
-    return res.status(403).json({ error: "You must provide a title" });
-  }
   tags = tags.map((tag) => tag.toLowerCase());
 
   let blog_id =
+    id ||
     title
       .replace(/[^a-zA-Z0-9]/g, " ")
       .replace(/\s+/g, "-")
       .trim() + nanoid();
   console.log(blog_id);
 
-  let blog = new Blog({
-    title,
-    des,
-    banner,
-    content,
-    tags,
-    author: authorId,
-    blog_id,
-    draft: Boolean(draft),
-  });
-
-  blog
-    .save()
-    .then((blog) => {
-      let incrementval = draft ? 0 : 1;
-
-      User.findOneAndUpdate(
-        {
-          _id: authorId,
-        },
-        {
-          $inc: { "account_info.total_posts": incrementval },
-          $push: {
-            blogs: blog._id,
-          },
-        }
-      )
-        .then((user) => {
-          return res.status(200).json({ id: blog.blog_id });
-        })
-        .catch((error) => {
-          return res.status(500).json({ error: "Failed to updated post" });
-        });
-    })
-    .catch((error) => {
-      return res.status(500).json({ error: error.message });
+  if (id) {
+    Blog.findOneAndUpdate(
+      { blog_id },
+      { title, des, banner, content, tags, draft: draft ? draft : false }
+    )
+      .then(() => {
+        return res.status(200).json({ id: blog_id });
+      })
+      .catch((err) => {
+        return res.status(500).json({ error: err.message });
+      });
+  } else {
+    let blog = new Blog({
+      title,
+      des,
+      banner,
+      content,
+      tags,
+      author: authorId,
+      blog_id,
+      draft: Boolean(draft),
     });
+
+    blog
+      .save()
+      .then((blog) => {
+        let incrementval = draft ? 0 : 1;
+
+        User.findOneAndUpdate(
+          {
+            _id: authorId,
+          },
+          {
+            $inc: { "account_info.total_posts": incrementval },
+            $push: {
+              blogs: blog._id,
+            },
+          }
+        )
+          .then((user) => {
+            return res.status(200).json({ id: blog.blog_id });
+          })
+          .catch((error) => {
+            return res.status(500).json({ error: error.message });
+          });
+      })
+      .catch((error) => {
+        return res.status(500).json({ error: error.message });
+      });
+  }
 });
 
 server.post("/get-blog", (req, res) => {
-  let { blog_id } = req.body;
-  let incrementval = 1;
+  let { blog_id, draft, mode } = req.body;
+
+  let incrementval = mode != "edit" ? 1 : 0;
   Blog.findOneAndUpdate(
     { blog_id },
     { $inc: { "activity.total_reads": incrementval } }
@@ -470,12 +487,64 @@ server.post("/get-blog", (req, res) => {
       ).catch((err) => {
         return res.status(500).json({ error: err.message });
       });
+
+      if (blog.draft && !draft) {
+        return res.status(500).json({ error: "you can not access draft blog" });
+      }
       return res.status(200).json({ blog });
     })
     .catch((err) => {
       return res.status(500).json({ error: err.message });
     });
 });
+
+server.post("/like-blog", vefifyJWT, (req, res) => {
+  let user_id = req.user;
+
+  let { _id, islikedbyuser } = req.body;
+
+  let incrementalVal = !islikedbyuser ? 1 : -1;
+
+  Blog.findOneAndUpdate(
+    { _id },
+    { $inc: { "activity.total_likes": incrementalVal } }
+  ).then((blog) => {
+    console.log(blog);
+    if (!islikedbyuser) {
+      let like = new Notification({
+        type: "like",
+        blog: _id,
+        notification_for: blog.author || " ",
+        user: user_id,
+      });
+      like.save().then((notification) => {
+        return res.status(200).json({ liked_by_user: true });
+      });
+    } else {
+      Notification.findOneAndDelete({ user: user_id, blog: _id, type: "like" })
+        .then((data) => {
+          return res.status(200).json({ liked_by_user: false });
+        })
+        .catch((err) => {
+          return res.status(500).json({ err: err.message });
+        });
+    }
+  });
+});
+
+server.post("/isliked-by-user", vefifyJWT, (req, res) => {
+  let user_id = req.user;
+
+  let { _id } = req.body;
+  Notification.exists({ user: user_id, type: "like", blog: _id })
+    .then((result) => {
+      return res.status(200).json({ result });
+    })
+    .catch((err) => {
+      return res.status(500).json({ err: err.message });
+    });
+});
+
 server.listen(PORT, () => {
-  console.log("Listening on port wohooooo😄 ->", +PORT);
+  console.log("Listening on " + PORT + "  wohooooo 😄😄👲👲");
 });

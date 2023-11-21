@@ -30,6 +30,7 @@ const App = () => {
         <Router>
           <Routes>
             <Route path="/editor" element={<Editor />} />
+            <Route path="/editor/:blog_id" element={<Editor />} />
             <Route path="/" element={<Navbar />} />
             <Route index element={<Homepage />} />
             <Route path="/signin" element={<LoginPage />} />

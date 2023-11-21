@@ -19,7 +19,7 @@ const RelatedBlogCard = ({ content, auther }) => {
     <>
       <Link to={`/blog/${id}`}>
         <div className="border border-white/10 rounded-lg  ]">
-          <div className="max-w-xs  hover:shadow-lg p-1 h-96 ">
+          <div className="max-w-xs  hover:shadow-lg  h-96 ">
             <p className="border  bg-black/40 border-black/40 inline-block px-2 w-24 py-1 absolute text-white rounded-lg truncate">
               {tags}
             </p>
@@ -28,31 +28,33 @@ const RelatedBlogCard = ({ content, auther }) => {
               src={banner}
               alt="banner"
             />
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-white/60">
-                Written by <span className="text-white"> {fullname}</span>
-              </p>
+            <div className="p-1">
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-white/60">
+                  Written by <span className="text-white"> {fullname}</span>
+                </p>
 
-              <p className="text-white/50"> {getDay(publishedAt)}</p>
+                <p className="text-white/50"> {getDay(publishedAt)}</p>
+              </div>
+
+              <div className="flex items-center gap-x-2">
+                <img
+                  src={profile_img}
+                  className="w-[25px] rounded-full h-[25px]"
+                  alt="profileimg"
+                />
+                <p className="text-white/60">@{username}</p>
+              </div>
+              <div className="flex items-center  justify-between">
+                <p className="text-2xl font-white line-clamp-1 mt-2">{title}</p>
+
+                <p className="flex items-center gap-x-1 ">
+                  <AiOutlineHeart className="text-xl" /> {total_likes}
+                </p>
+              </div>
+
+              <p className="line-clamp-3 text-white/60">{des}</p>
             </div>
-
-            <div className="flex items-center gap-x-2">
-              <img
-                src={profile_img}
-                className="w-[25px] rounded-full h-[25px]"
-                alt="profileimg"
-              />
-              <p className="text-white/60">@{username}</p>
-            </div>
-            <div className="flex items-center  justify-between">
-              <p className="text-2xl font-white line-clamp-1 mt-2">{title}</p>
-
-              <p className="flex items-center gap-x-1 ">
-                <AiOutlineHeart className="text-xl" /> {total_likes}
-              </p>
-            </div>
-
-            <p className="line-clamp-3 text-white/60">{des}</p>
           </div>
         </div>
       </Link>

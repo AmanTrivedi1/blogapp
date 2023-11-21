@@ -1,11 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import logo from "../imgs/logo.png";
 import { Toaster, toast } from "react-hot-toast";
 import AnimationWrapper from "../common/page-animation";
 import { uploadImage } from "../common/aws";
 import { EditorContext } from "../pages/editor.pages";
 import EditorJS from "@editorjs/editorjs";
+import Banner from "../../src/imgs/blog banner.png";
 import { tools } from "./tools.component";
 import axios from "axios";
 import { UserContext } from "../App";
@@ -13,42 +14,7 @@ import { UserContext } from "../App";
 const BlogEditor = () => {
   let navigate = useNavigate();
 
-  const [bannerimg, setBannerImg] = useState("");
-  const [isRandomImageFetched, setIsRandomImageFetched] = useState(false);
-  const PEXELS_API_KEY = import.meta.env.VITE_PEXELS_API_KEY;
-
-  const getRandomImage = async () => {
-    try {
-      const response = await axios.get("https://api.pexels.com/v1/curated", {
-        headers: {
-          Authorization: PEXELS_API_KEY,
-        },
-      });
-
-      if (response.data.photos && response.data.photos.length > 0) {
-        const randomIndex = Math.floor(
-          Math.random() * response.data.photos.length
-        );
-        const randomImage = response.data.photos[randomIndex];
-        const imageUrl = randomImage.src.original;
-        return imageUrl;
-      } else {
-        throw new Error("No photos found in the Pexels response.");
-      }
-    } catch (error) {
-      console.error("Error fetching random image:", error.message);
-      return null;
-    }
-  };
-
-  getRandomImage().then((Banner) => {
-    if (Banner) {
-      setBannerImg(Banner);
-      console.log("Random image URL:", Banner);
-    } else {
-      console.log("Unable to fetch a random image.");
-    }
-  });
+  let { blog_id } = useParams();
 
   let {
     blog,
@@ -60,17 +26,11 @@ const BlogEditor = () => {
   } = useContext(EditorContext);
 
   useEffect(() => {
-    if (!isRandomImageFetched) {
-      getRandomImage();
-    }
-  }, [isRandomImageFetched]);
-
-  useEffect(() => {
     if (!textEditor.isReady) {
       setTextEditor(
         new EditorJS({
           holderId: "textEditor",
-          data: content,
+          data: Array.isArray(content) ? content[0] : content,
           tools: tools,
           placeholder: "Lets write awesom Story",
         })
@@ -114,7 +74,7 @@ const BlogEditor = () => {
 
   const handleError = (e) => {
     let img = e.target;
-    img.src = bannerimg;
+    img.src = Banner;
   };
 
   let {
@@ -166,11 +126,15 @@ const BlogEditor = () => {
           draft: true,
         };
         axios
-          .post(import.meta.env.VITE_SERVER_DOMAIN + "/create-blog", blogObj, {
-            headers: {
-              Authorization: `Bearer ${access_token} `,
-            },
-          })
+          .post(
+            import.meta.env.VITE_SERVER_DOMAIN + "/create-blog",
+            { ...blogObj, id: blog_id },
+            {
+              headers: {
+                Authorization: `Bearer ${access_token} `,
+              },
+            }
+          )
           .then(() => {
             e.target.classList.remove("disable");
             toast.dismiss(loadingToast);

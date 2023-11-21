@@ -26,8 +26,8 @@ const BlogPage = () => {
   let { blog_id } = useParams();
   const [blog, setBlog] = useState(blogStructure);
   const [similarBlog, setSimilarBlog] = useState(null);
-
   const [loading, setLoading] = useState(true);
+  const [islikedbyuser, setIsLikedByUser] = useState();
 
   let {
     title,
@@ -81,7 +81,9 @@ const BlogPage = () => {
         {loading ? (
           <Loader />
         ) : (
-          <BlogContext.Provider value={{ blog, setBlog }}>
+          <BlogContext.Provider
+            value={{ blog, setBlog, islikedbyuser, setIsLikedByUser }}
+          >
             <div className="bg-[#212121] min-h-screen">
               <Link
                 className=" absolute top-10   p-2 rounded-full text-white/40  mt-5  left-10"
@@ -133,9 +135,13 @@ const BlogPage = () => {
                     );
                   })}
                 </div>
-                <h1 className="text-3xl font-bold mb-10 mt-20 text-white">
-                  Similar Blog's
-                </h1>
+                {similarBlog != null && similarBlog.length ? (
+                  <h1 className="text-3xl font-bold mb-10 mt-20 text-white">
+                    Similar Blog's
+                  </h1>
+                ) : (
+                  <></>
+                )}
                 {similarBlog != null && similarBlog.length ? (
                   <div className="flex flex-wrap gap-2 justify-center sm:justify-start items-center  ">
                     {similarBlog.map((blog, i) => {
