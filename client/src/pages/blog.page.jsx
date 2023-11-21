@@ -10,6 +10,7 @@ import BlogInteraction from "../components/blog-interaction.component";
 
 import BlogContent from "../components/blog-content.component";
 import RelateBlogCard from "../components/related-blogcomponent";
+import CommentsContainer from "../components/comments.component";
 
 export const blogStructure = {
   title: " ",
@@ -28,6 +29,9 @@ const BlogPage = () => {
   const [similarBlog, setSimilarBlog] = useState(null);
   const [loading, setLoading] = useState(true);
   const [islikedbyuser, setIsLikedByUser] = useState();
+
+  const [commentsWrapper, setCommentsWrapper] = useState(false);
+  const [totalParentCommentsLoaded, setTotalParentCommentsLoaded] = useState(0);
 
   let {
     title,
@@ -73,6 +77,9 @@ const BlogPage = () => {
     setBlog(blogStructure);
     setSimilarBlog(null);
     setLoading(true);
+    setIsLikedByUser(false);
+    // setCommentsWrapper(false);
+    setTotalParentCommentsLoaded(0);
   };
 
   return (
@@ -82,8 +89,18 @@ const BlogPage = () => {
           <Loader />
         ) : (
           <BlogContext.Provider
-            value={{ blog, setBlog, islikedbyuser, setIsLikedByUser }}
+            value={{
+              blog,
+              setBlog,
+              islikedbyuser,
+              setIsLikedByUser,
+              commentsWrapper,
+              setCommentsWrapper,
+              totalParentCommentsLoaded,
+              setTotalParentCommentsLoaded,
+            }}
           >
+            <CommentsContainer />
             <div className="bg-[#212121] min-h-screen">
               <Link
                 className=" absolute top-10   p-2 rounded-full text-white/40  mt-5  left-10"

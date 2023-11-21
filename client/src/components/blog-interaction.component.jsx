@@ -26,6 +26,7 @@ const BlogInteraction = () => {
     setBlog,
     islikedbyuser,
     setIsLikedByUser,
+    setCommentsWrapper,
   } = useContext(BlogContext);
 
   let {
@@ -34,7 +35,6 @@ const BlogInteraction = () => {
 
   useEffect(() => {
     if (access_token) {
-      // make request to server to get like info
       axios
         .post(
           import.meta.env.VITE_SERVER_DOMAIN + "/isliked-by-user",
@@ -123,7 +123,12 @@ const BlogInteraction = () => {
               </Link>
             </>
           )}
-          <button className="rounded-full flex  h-8 w-8 items-center justify-center ">
+          <button
+            onClick={() => {
+              setCommentsWrapper((prev) => !prev);
+            }}
+            className="rounded-full flex  h-8 w-8 items-center justify-center "
+          >
             <FaRegCommentDots className="text-xl" />
           </button>
           <p className="text-base ">{total_comments}</p>
