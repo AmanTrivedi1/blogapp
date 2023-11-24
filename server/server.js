@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import User from "./Schema/User.js";
 import Blog from "./Schema/Blog.js";
 import Notification from "./Schema/Notification.js";
+import Comment from "./Schema/Comment.js";
 import { nanoid } from "nanoid";
 import jwt from "jsonwebtoken";
 import cors from "cors";
@@ -542,6 +543,79 @@ server.post("/isliked-by-user", vefifyJWT, (req, res) => {
     })
     .catch((err) => {
       return res.status(500).json({ err: err.message });
+    });
+});
+
+server.post("/add-comment", vefifyJWT, (req, res) => {
+  let user_id = req.user;
+
+  let { _id, comment, blog_author } = req.body;
+
+  if (!comment.length) {
+    return (
+      res.status(403), json({ err: "Write something to leave a comment..." })
+    );
+  }
+  let commentObj = new Comment({
+    blog_id: _id,
+    blog_author,
+    comment,
+    commented_by: user_id,
+  });
+
+  commentObj.save().then((commentFile) => {
+    let { comment, commentedAt, children } = commentFile;
+    Blog.findOneAndUpdate(
+      { _id },
+      {
+        $push: { comments: commentFile._id },
+        $inc: { "activity.total_comments": 1 },
+        "activity.total_parent_comments": 1,
+      }
+    ).then((blog) => {
+      console.log(blog + "New Comment Created bhaiya ");
+    });
+    let notificationObj = {
+      type: "comment",
+      blog: _id,
+      notification_for: blog_author,
+      user: user_id,
+      comment: commentFile._id,
+    };
+    new Notification(notificationObj)
+      .save()
+      .then((notification) => console.log("New Notification Created"));
+    return res.status(200).json({
+      comment,
+      commentedAt,
+      _id: commentFile._id,
+      user_id,
+      children,
+    });
+  });
+});
+
+server.post("/get-blog-comments", (req, res) => {
+  let { blog_id, skip } = req.body;
+
+  let maxLimit = 5;
+
+  Comment.find({ blog_id, isReply: false })
+    .populate(
+      "commented_by",
+      "personal_info.username  personal_info.fullname personal_info.profile_img  "
+    )
+    .skip(skip)
+    .limit(maxLimit)
+    .sort({
+      commentedAt: -1,
+    })
+    .then((comment) => {
+      return res.status(200).json(comment);
+    })
+    .catch((err) => {
+      console.log(err.message);
+      return res.status(500).json({ error: err.message });
     });
 });
 

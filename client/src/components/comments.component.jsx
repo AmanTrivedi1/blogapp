@@ -2,6 +2,32 @@ import React, { useContext } from "react";
 import { BlogContext } from "../pages/blog.page";
 import { IoMdClose } from "react-icons/io";
 import CommentField from "./comment-field.component";
+import axios from "axios";
+
+export const fetchComments = async ({
+  skip = 0,
+  blog_id,
+  setParentCommentCountFun,
+  comment_array = null,
+}) => {
+  let res;
+  await axios
+    .post(import.meta.env.VITE_SERVER_DOMAIN + "/get-blog-comments", {
+      blog_id,
+      skip,
+    })
+    .then(({ data }) => {
+      data.map((comment) => {
+        comment.childrenLevel = 0;
+      });
+      setParentCommentCountFun((preVal = preVal + data.length));
+      if (comment_array.length == null) {
+        res = { results: data };
+      } else {
+        res = { results: [...comment_array, ...data] };
+      }
+    });
+};
 
 const CommentsContainer = () => {
   let {
@@ -9,6 +35,7 @@ const CommentsContainer = () => {
     commentsWrapper,
     setCommentsWrapper,
   } = useContext(BlogContext);
+
   return (
     <>
       <div
