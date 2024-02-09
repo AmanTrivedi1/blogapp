@@ -46,7 +46,7 @@ const Editor = () => {
         setLoading(false);
         console.log(err);
       });
-  });
+  } , []);
 
   return (
     <>

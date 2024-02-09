@@ -21,7 +21,7 @@ admin.initializeApp({
 const server = express();
 let PORT = 3000;
 
-let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/; // regex for email
+let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/; 
 let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
 
 server.use(express.json());
@@ -401,17 +401,14 @@ server.post("/create-blog", vefifyJWT, (req, res) => {
         .json({ error: "You Should provides some tags under limit 10" });
     }
   }
-
   tags = tags.map((tag) => tag.toLowerCase());
-
   let blog_id =
     id ||
     title
-      .replace(/[^a-zA-Z0-9]/g, " ")
+      .replace(/[^a-zA-Z0-9]/g, ' ')
       .replace(/\s+/g, "-")
       .trim() + nanoid();
   console.log(blog_id);
-
   if (id) {
     Blog.findOneAndUpdate(
       { blog_id },
@@ -421,7 +418,7 @@ server.post("/create-blog", vefifyJWT, (req, res) => {
         return res.status(200).json({ id: blog_id });
       })
       .catch((err) => {
-        return res.status(500).json({ error: err.message });
+        return res.status(500).json({ error: "Error while editing" });
       });
   } else {
     let blog = new Blog({
@@ -439,7 +436,6 @@ server.post("/create-blog", vefifyJWT, (req, res) => {
       .save()
       .then((blog) => {
         let incrementval = draft ? 0 : 1;
-
         User.findOneAndUpdate(
           {
             _id: authorId,
@@ -455,11 +451,11 @@ server.post("/create-blog", vefifyJWT, (req, res) => {
             return res.status(200).json({ id: blog.blog_id });
           })
           .catch((error) => {
-            return res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: "problem before the end" });
           });
       })
       .catch((error) => {
-        return res.status(500).json({ error: error.message });
+        return res.status(500).json({ error: "Problem at the end" });
       });
   }
 });
@@ -495,7 +491,7 @@ server.post("/get-blog", (req, res) => {
       return res.status(200).json({ blog });
     })
     .catch((err) => {
-      return res.status(500).json({ error: err.message });
+        return res.status(500).json({ error: "Error at the end"});
     });
 });
 

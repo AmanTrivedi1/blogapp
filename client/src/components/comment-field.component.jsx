@@ -86,13 +86,12 @@ const CommentField = ({ action }) => {
       <Toaster />
       <textarea
         onChange={(e) => setComment(e.target.value)}
-        className="input-box bg-black/10 text-white/50  focus:bg-black/20 placeholder:white resize-none
-        h-[150px] overflow-auto
+        className="input-box bg-black/10 text-white/80  focus:ehite/60 placeholder:white/80 resize-none
+        h-[180px] overflow-auto
          pl-5"
         value={comment}
-        placeholder="leave a comment"
+        placeholder="Leave a thought"
       ></textarea>
-
       <button onClick={handleComment} className="btn-light px-6 py-2 mt-5 ">
         {action}
       </button>
