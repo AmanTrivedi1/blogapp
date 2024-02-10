@@ -11,6 +11,8 @@ import SeacrhPage from "./pages/search.page";
 import NotFound from "./pages/404.page";
 import ProfilePage from "./pages/profile.page";
 import BlogPage from "./pages/blog.page";
+import SideNav from "./components/sidenavbar.component";
+import ChnagePassword from "./pages/change-password.page";
 
 export const UserContext = createContext({});
 
@@ -33,6 +35,10 @@ const App = () => {
             <Route path="/editor/:blog_id" element={<Editor />} />
             <Route path="/" element={<Navbar />} />
             <Route index element={<Homepage />} />
+            <Route path="settings" element={<SideNav/>}>
+                   <Route path="edit-profile" element={<h1>Edit profile page</h1>} />
+                   <Route path="change-password" element={<ChnagePassword/>} />
+            </Route>
             <Route path="/signin" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="search/:query" element={<SeacrhPage />} />

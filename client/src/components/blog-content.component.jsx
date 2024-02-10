@@ -81,7 +81,6 @@ const BlogContent = ({ block }) => {
     );
   }
 
-  // Move this block outside of the "if (type == 'header')" block
   if (type == "image") {
     return <Img url={data.file.url} caption={data.caption} />;
   }

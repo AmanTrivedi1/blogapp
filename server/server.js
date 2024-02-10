@@ -42,6 +42,8 @@ const generateUploadURL = async () => {
   const date = new Date();
   const imageName = `${nanoid()}-${date.getTime()}.jpeg`;
 
+  
+
   return await s3.getSignedUrlPromise("putObject", {
     Bucket: "writeblogapp",
     Key: imageName,
@@ -230,6 +232,40 @@ server.post("/google-auth", async (req, res) => {
       res.status(500).json({ error: "Failed to Authenticate" });
     });
 });
+
+
+server.post("/change-password", vefifyJWT , (req, res)=>{
+  let {currentPassword, newPassword} = req.body;
+
+  if(!passwordRegex.test(currentPassword) || !passwordRegex.test(newPassword)){
+     return res.status(403).json({error :"Password should be 6 to 20 char long with a numeric , 1 lowercase and 1 upercase"})
+ }
+
+ User.findOne({_id: req.user }).then((user) => {
+    if(user.google_auth){
+         return res.status(403).json({error :"This account password can not be changed beacause it created via a googleauth"})
+    }
+    bcrypt.compare(currentPassword , user.personal_info.password , (err , result)=>{
+      if(err) {
+        return res.status(500).json({error :"Some error accured while changing the password"})
+      }
+      if(!result){
+        return res.status(403).json({error : "Incorrect Password"})
+      }
+      bcrypt.hash(newPassword , 10 , (err , hashed_password)=>{
+             User.findOneAndUpdate({_id:req.user} , {"personal_info.password": hashed_password}).then((u)=>{
+                   return res.status(200).json({status: "password changed successfully"})
+             }).catch(err => {
+              return res.status(500).json( {error : "Some error occured while changing the password , please try agian latter"})
+             })
+      })
+    })
+ }).catch(err =>{
+  console.log(err)
+  res.status(500).json({error :"User not found"});
+})
+
+})
 
 // For getting the all blogs post
 
@@ -491,7 +527,7 @@ server.post("/get-blog", (req, res) => {
       return res.status(200).json({ blog });
     })
     .catch((err) => {
-        return res.status(500).json({ error: "Error at the end"});
+        return res.status(500).json({ error: err.message});
     });
 });
 
@@ -545,11 +581,11 @@ server.post("/isliked-by-user", vefifyJWT, (req, res) => {
 server.post("/add-comment", vefifyJWT, (req, res) => {
   let user_id = req.user;
 
-  let { _id, comment, blog_author } = req.body;
+  let { _id, comment, blog_author} = req.body;
 
   if (!comment.length) {
     return (
-      res.status(403), json({ err: "Write something to leave a comment..." })
+      res.status(403), json({ error: "Write something to leave a comment..." })
     );
   }
   let commentObj = new Comment({
@@ -564,12 +600,12 @@ server.post("/add-comment", vefifyJWT, (req, res) => {
     Blog.findOneAndUpdate(
       { _id },
       {
-        $push: { comments: commentFile._id },
+        $push: { "comments": commentFile._id },
         $inc: { "activity.total_comments": 1 },
         "activity.total_parent_comments": 1,
       }
     ).then((blog) => {
-      console.log(blog + "New Comment Created bhaiya ");
+      console.log(blog + "Comments created");
     });
     let notificationObj = {
       type: "comment",
@@ -614,6 +650,25 @@ server.post("/get-blog-comments", (req, res) => {
       return res.status(500).json({ error: err.message });
     });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 server.listen(PORT, () => {
   console.log("Listening on " + PORT + "  wohooooo 😄😄👲👲");

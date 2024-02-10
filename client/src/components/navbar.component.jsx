@@ -35,7 +35,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="navbar background ">
+      <nav className="navbar background  z-50">
         <Link to="/" className="flex-none w-10 font-bold text-xl  " herf="/">
           <img src={logo} alt="Icon" className="w-full" />
         </Link>

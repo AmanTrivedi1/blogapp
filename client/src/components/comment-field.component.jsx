@@ -1,10 +1,8 @@
 import React, { useContext, useState } from "react";
-
 import { UserContext } from "../App";
 import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
 import { BlogContext } from "../pages/blog.page";
-
 const CommentField = ({ action }) => {
   let {
     blog,
@@ -15,15 +13,13 @@ const CommentField = ({ action }) => {
       activity,
       activity: { total_comments, total_parent_comments },
     },
-    setBLogs,
+    setBlog,
     setTotalParentCommentsLoaded,
   } = useContext(BlogContext);
-
   const [comment, setComment] = useState("");
   let {
     userAuth: { access_token, username, fullname, profile_img },
   } = useContext(UserContext);
-
   const handleComment = () => {
     if (!access_token) {
       return toast.error("Login kar k ao");
@@ -31,7 +27,6 @@ const CommentField = ({ action }) => {
     if (!comment.length) {
       return toast.error("Write something to leave a comment ...");
     }
-
     axios
       .post(
         import.meta.env.VITE_SERVER_DOMAIN + "/add-comment",
@@ -42,25 +37,22 @@ const CommentField = ({ action }) => {
         },
         {
           headers: {
-            Authorization: `Bearer ${access_token}`,
+            'Authorization': `Bearer ${access_token}`,
           },
         }
       )
       .then(({ data }) => {
+        console.log("Comments add here");
+        console.log(data )
         setComment("");
         data.commented_by = {
           personal_info: { username, profile_img, fullname },
         };
-
         let newCommentArr;
-
         data.childrenLevel = 0;
-
         newCommentArr = [data];
-
         let parentCommentIncrementval = 1;
-
-        setBLogs({
+        setBlog({
           ...blog,
           comments: { ...comments, results: newCommentArr },
           activity: {
@@ -68,11 +60,10 @@ const CommentField = ({ action }) => {
             total_comments: total_comments + 1,
             total_parent_comments:
               total_parent_comments + parentCommentIncrementval,
-          },
+          }
         });
-
         setTotalParentCommentsLoaded(
-          (prevval) => prevval + setTotalParentCommentsLoaded
+          (preVal) => preVal + setTotalParentCommentsLoaded
         );
         console.log(data);
       })
@@ -92,7 +83,7 @@ const CommentField = ({ action }) => {
         value={comment}
         placeholder="Leave a thought"
       ></textarea>
-      <button onClick={handleComment} className="btn-light px-6 py-2 mt-5 ">
+        <button onClick={handleComment} className="btn-light px-6 py-2 mt-5 ">
         {action}
       </button>
     </>

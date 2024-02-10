@@ -16,12 +16,12 @@ export const fetchComments = async ({
       blog_id,
       skip,
     })
-    .then(({ data }) => {
+    .then( ({ data }) => {
       data.map((comment) => {
         comment.childrenLevel = 0;
       });
       setParentCommentCountFun((preVal = preVal + data.length));
-      if (comment_array.length == null) {
+      if (comment_array === null) {
         res = { results: data };
       } else {
         res = { results: [...comment_array, ...data] };

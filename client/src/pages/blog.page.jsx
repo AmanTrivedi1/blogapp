@@ -1,16 +1,15 @@
 import axios from "axios";
 import React, { createContext, useEffect, useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
-
 import { Link, useParams } from "react-router-dom";
 import AnimationWrapper from "../common/page-animation";
 import Loader from "../components/loader.component";
 import { getDay } from "../common/date";
 import BlogInteraction from "../components/blog-interaction.component";
-
 import BlogContent from "../components/blog-content.component";
 import RelateBlogCard from "../components/related-blogcomponent";
-import CommentsContainer from "../components/comments.component";
+import CommentsContainer, { fetchComments } from "../components/comments.component";
+import toast from "react-hot-toast";
 
 export const blogStructure = {
   title: " ",
@@ -20,15 +19,14 @@ export const blogStructure = {
   banner: "",
   publishedAt: "",
 };
-
 export const BlogContext = createContext({});
-
 const BlogPage = () => {
   let { blog_id } = useParams();
   const [blog, setBlog] = useState(blogStructure);
   const [similarBlog, setSimilarBlog] = useState(null);
   const [loading, setLoading] = useState(true);
   const [islikedbyuser, setIsLikedByUser] = useState();
+
 
   const [commentsWrapper, setCommentsWrapper] = useState(false);
   const [totalParentCommentsLoaded, setTotalParentCommentsLoaded] = useState(0);
@@ -42,12 +40,16 @@ const BlogPage = () => {
     },
     publishedAt,
   } = blog;
-
   const fetchblog = () => {
     axios
       .post(import.meta.env.VITE_SERVER_DOMAIN + "/get-blog", { blog_id })
-      .then(({ data: { blog } }) => {
-        setBlog(blog);
+      .then(  ({ data: { blog } }) => {
+        // blog.comments = await fetchComments({
+        //   blog_id: blog._id,
+        //   setParentCommentCountFun: setTotalParentCommentsLoaded
+        // });
+      setBlog(blog)
+        console.log(blog)
         axios
           .post(import.meta.env.VITE_SERVER_DOMAIN + "/search-blogs", {
             tag: blog.tags[0],
@@ -56,17 +58,16 @@ const BlogPage = () => {
           })
           .then(({ data }) => {
             setSimilarBlog(data.blogs);
-            console.log(data.blogs);
           });
-
         setLoading(false);
-        console.log(blog);
       })
       .catch((err) => {
         setLoading(false);
         console.log(err);
+        toast.error(err);
       });
   };
+  
 
   useEffect(() => {
     resetStates();
@@ -78,7 +79,7 @@ const BlogPage = () => {
     setSimilarBlog(null);
     setLoading(true);
     setIsLikedByUser(false);
-    // setCommentsWrapper(false);
+    setCommentsWrapper(false);
     setTotalParentCommentsLoaded(0);
   };
 
