@@ -407,7 +407,28 @@ server.post("/get-profile", (req, res) => {
     });
 });
 
+server.post("/update-profile-img" , vefifyJWT , (req , res) =>{
+  let {url } = req.body;
+
+  User.findOneAndUpdate({_id:req.user} , {"personal_info.profile_img":url }).then(()=>{
+    return res.status(200).json({profile_img:url})
+  }).catch(err => {
+    return res.status(500) .json({error:err.message})
+  })
+
+})
+
+
+
+
+
+
+
 // For Creating the post
+
+
+
+
 
 server.post("/create-blog", vefifyJWT, (req, res) => {
   let authorId = req.user;
