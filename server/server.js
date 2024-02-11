@@ -407,6 +407,9 @@ server.post("/get-profile", (req, res) => {
     });
 });
 
+
+
+
 server.post("/update-profile-img" , vefifyJWT , (req , res) =>{
   let {url } = req.body;
 
@@ -417,8 +420,67 @@ server.post("/update-profile-img" , vefifyJWT , (req , res) =>{
   })
 
 })
+server.post("/update-profile", vefifyJWT, async (req, res) => {
+  try {
+      let { username, bio, social_links } = req.body;
+      let bioLimit = 200;
 
+      if (username.length < 3) {
+          return res.status(403).json({ error: "Username must be greater than 3 char" });
+      }
 
+      if (bio.length > bioLimit) {
+          return res.status(403).json({ error: `Bio cannot be greater than ${bioLimit} char` });
+      }
+
+      let socialLinksArr = Object.keys(social_links);
+
+      const validSocialLinks = {
+          youtube: "youtube.com",
+          instagram: "instagram.com",
+          twitter: "twitter.com",
+          github: "github.com",
+          website: "", // Allow empty website field
+          facebook: "facebook.com"
+      };
+
+      for (let i = 0; i < socialLinksArr.length; i++) {
+          if (social_links[socialLinksArr[i]] && social_links[socialLinksArr[i]].length > 0) {
+              // For website, check if it's not empty but don't require a URL format
+              if (socialLinksArr[i] === "website") {
+                  continue;
+              }
+
+              // Check if the social link is a valid key and contains the correct URL format with "https://"
+              const link = social_links[socialLinksArr[i]];
+              if (
+                  !link.startsWith("https://") ||
+                  !validSocialLinks[socialLinksArr[i]] ||
+                  !link.includes(validSocialLinks[socialLinksArr[i]])
+              ) {
+                  return res.status(403).json({ error: `${socialLinksArr[i]} Link is invalid. You must enter a valid URL starting with "https://"` });
+              }
+          }
+      }
+
+      // If all checks pass, update the profile
+      let updateObj = {
+          "personal_info.username": username,
+          "personal_info.bio": bio,
+          social_links
+      };
+
+      await User.findOneAndUpdate({ _id: req.user }, updateObj, { runValidators: true });
+
+      res.status(200).json({ username });
+  } catch (err) {
+      if (err.code === 11000) {
+          return res.status(409).json({ error: "Username already taken" });
+      } else {
+          return res.status(500).json({ error: err.message });
+      }
+  }
+});
 
 
 

@@ -12,13 +12,14 @@ import { storeInSession } from '../common/session';
 
 const EditProfile = () => {
 
-    let bioLimit=140;
+    let bioLimit=200;
     let profileImgEle = useRef();
     const [profile , setProfile] = useState(profileDataStructure);
     const [loading , setLoading] = useState(true);
     const [charactersLeft , setCharactersLeft] = useState(bioLimit);
     const [updatedProfileImg , setUpdatedProfileImg] = useState(null);
    
+    let editProfileForm = useRef();
 
     let { personal_info :{fullname , username:profile_username  , profile_img , email , bio} , social_links} = profile;
 
@@ -77,13 +78,72 @@ const EditProfile = () => {
             })
         }
     }
+    const handleSubmit = (e) => {
+        e.preventDefault();
+    
+        let form = new FormData(editProfileForm.current);
+        let formData = {};
+    
+        for (let [key, value] of form.entries()) {
+            formData[key] = value;
+        }
+    
+        let { username, bio, youtube, instagram, twitter, github, website, facebook } = formData;
+    
+        if (username.length < 3) {
+            return toast.error("Username must be greater than 3 char");
+        }
+    
+        if (bio.length > bioLimit) {
+            return toast.error(`Bio can not be greater than ${bioLimit} char`);
+        }
+    
+        let loadingToast = toast.loading("Uploading...");
+        e.target.setAttribute("disabled", true);
+    
+        // Construct social_links object
+        let social_links = {
+            youtube,
+            instagram,
+            twitter,
+            github,
+            website,
+            facebook
+        };
+    
+        axios.post(import.meta.env.VITE_SERVER_DOMAIN + "/update-profile", {
+            username,
+            bio,
+            social_links  
+        }, {
+            headers: {
+                "Authorization": `Bearer ${access_token}`
+            }
+        }).then(({ data }) => {
+            if (userAuth.username != data.username) {
+                let newUserAuth = { ...userAuth, username: data.username };
+                storeInSession("user", JSON.stringify(newUserAuth));
+                setUserAuth(newUserAuth);
+            }
+            toast.dismiss(loadingToast);
+            e.target.removeAttribute("disabled");
+            toast.success("Profile updated successfully");
+        }).catch(({ response }) => {
+            toast.dismiss(loadingToast);
+            e.target.removeAttribute("disabled");
+            toast.error(response.data.error);
+        });
+    };
+    
+
+
   return (
     <>
     <Toaster/>
     <AnimationWrapper>
         {
             loading ? <Loader/> : 
-            <form>
+            <form ref={editProfileForm}>
                   <h1 className='max-md:hidden'>Edit Profile</h1>  
                    <div className='flex flex-col lg:row items-start py-10 gap-10'>
                         <div className='max-lg:centre mb-5'>
@@ -119,11 +179,11 @@ const EditProfile = () => {
                                      Object.keys(social_links).map((key, i) => {
                                      let link = social_links[key];
                                      <i className={"fi "+ (key!= "website" ?  "fi-brands-"+ key : "fi-rr-globe")+    "text-2xl hover:text-black"}></i>
-                                      return <InputBox key={i} icon={"fi "+ (key!= "website" ?  "fi-brands-"+ key : "fi-rr-globe")} name={key} type="text" value={link} placeholder="https://itsmeaman.vercel.app"/>
+                                      return <InputBox key={i} icon={"fi "+ (key!= "website" ?  "fi-brands-"+ key : "fi-rr-globe")} name={key} type="text" value={link} placeholder="https://"/>
                                   })
                                  }
                               </div>
-                              <button className='btn-dark mb-4 w-full sm:w-auto'>Update</button>
+                              <button   onClick={handleSubmit} className='btn-dark mb-4 w-full sm:w-auto'>Update</button>
                      </div> 
             </form>
         }
