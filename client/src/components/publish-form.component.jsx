@@ -103,7 +103,8 @@ const PublishForm = () => {
         toast.success("Wo hooo blog is Published 👍");
 
         setTimeout(() => {
-          navigate("/");
+          navigate("/dashboard/blogs");
+
         }, 500);
       })
       .catch(({ response }) => {

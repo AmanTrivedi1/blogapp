@@ -140,7 +140,7 @@ const BlogEditor = () => {
             toast.dismiss(loadingToast);
             toast.success("Wo hooo blog is Saved👍");
             setTimeout(() => {
-              navigate("/");
+              navigate("/dashboard/blogs?tab=draft");
             }, 500);
           })
           .catch(({ response }) => {

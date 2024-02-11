@@ -1,6 +1,8 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Link } from 'react-router-dom';
 import { getDay } from '../common/date';
+import { UserContext } from '../App';
+import axios from 'axios';
 
 
 const BlogStats = ({stats}) => {
@@ -23,6 +25,10 @@ const BlogStats = ({stats}) => {
 
 export const ManagePublishBlogCard = ({blog}) => {
 
+    const {
+        userAuth: { access_token }
+      } = useContext(UserContext);
+
     let { banner , title  , blog_id , publishedAt , activity} = blog;
 
     let [ showStat , setShowStat] = useState(false);
@@ -39,7 +45,7 @@ export const ManagePublishBlogCard = ({blog}) => {
             <div className='flex gap-6 mt-3'>
                <Link  className='underline pr-4 py-2'  to={`/editor/${blog_id}`}>Edit</Link>
                <button  className='pr-4 py-2  underline lg:hidden'  onClick={()=> setShowStat(preVal =>!preVal)}>Stats</button>
-               <button  className='pr-4 py-2 underline text-red' >Delete</button>
+               <button onClick={(e)=>deleteBlog(blog,access_token , e.target )}  className='pr-4 py-2 underline text-red' >Delete</button>
             </div>
         
           </div>
@@ -56,9 +62,14 @@ export const ManagePublishBlogCard = ({blog}) => {
   )
 }
 
-export const ManageDraftBlogPost =({blog , index }) =>{
+export const ManageDraftBlogPost =({blog  }) =>{
 
-  let {title  , des , blog_id} = blog;
+    const {
+        userAuth: { access_token }
+      } = useContext(UserContext);
+
+  let {title  , des , blog_id , index} = blog;
+  index++;
   return (
     <>
     <div className='flex gap-5 lg:gap-10 pb-6 border-b mb-6 border-grey'>
@@ -69,7 +80,7 @@ export const ManageDraftBlogPost =({blog , index }) =>{
 
         <div className='flex gap-6 mt-3'>
            <Link  className='pr-4 py-2 underline' to={`/editor/${blog_id}`}>Edit</Link>
-           <button  className='pr-4 py-2 underline text-red' >Delete</button>
+           <button onClick={(e)=>deleteBlog(blog,access_token , e.target )}  className='pr-4 py-2 underline text-red' >Delete</button>
         </div>
      </div>
     </div>
@@ -77,6 +88,34 @@ export const ManageDraftBlogPost =({blog , index }) =>{
   )
 }
 
+const deleteBlog = ( blog, access_token , target)=>{
+    let {index , blog_id , setStateFun} = blog;
+    target.setAttribute("disabled", true)
+    axios.post(  import.meta.env.VITE_SERVER_DOMAIN + "/delete-blog" ,{blog_id} , {
+        headers:{
+            "Authorization":`Bearer ${access_token}`
+        }
+    }).then(({data})=>{
+        target.setAttribute("disabled", false);
+        setStateFun(preVal => {
 
+            let { deletedDocCount , totalDocs , results  } = preVal ;
+            
+            results.splice(index , 1 );
+
+            if(!deletedDocCount){
+                deletedDocCount =0;
+
+            }
+
+            if(!results.length && totalDocs -1  > 0) {
+                return null ; 
+            }
+         return {...preVal , totalDocs:totalDocs-1 , deletedDocCount:deletedDocCount+1}
+        })
+    }).catch(err=>{
+        console.log(err)
+    })
+}
 
 export default ManagePublishBlogCard

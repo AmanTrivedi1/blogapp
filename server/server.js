@@ -859,14 +859,24 @@ server.post("/user-written-blogs-count", vefifyJWT , (req, res) => {
 
 
 
+server.post("/delete-blog" , vefifyJWT , (req, res)=>{
 
+  
+  let user_id = req.user;
+  let {blog_id}= req.body;
 
+  Blog.findOneAndDelete({blog_id}).then(blog=>{
+    Notification.deleteMany({blog:blog._id}).then(data=> console.log("Notification Delted"));
+    Comment.deleteMany({blog_id:blog._id}).then(data=> console.log("Comments Deleted"));
 
+    User.findOneAndUpdate({_id:user_id} , {$pull:{blog:blog._id} , $inc:{"account_info.total_posts":blog.draft ? 0 : -1}})
+    .then(user =>console.log("Blog Deleted"));
+    return res.status(200).json({status:"done"})
+  }).catch(err => {
+    return res.status(500).json({error:err.message})
+  })
 
-
-
-
-
+})
 
 
 
