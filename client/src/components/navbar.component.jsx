@@ -57,7 +57,7 @@ const Navbar = () => {
         <Link to="/" className="flex-none w-10 font-bold text-xl  " herf="/">
           <img src={logo} alt="Icon" className="w-full" />
         </Link>
-        <p>   I am here{new_notification_available}</p>
+     
         <div
           className="absolute background hidden md:block  w-full left-0 top-full mt-0.5  py-4 px-[5vw] md:relative
                 md:inset-0 md:p-0 md:w-auto "

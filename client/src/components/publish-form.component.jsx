@@ -184,7 +184,7 @@ const PublishForm = () => {
 
             <button
               onClick={publishBlog}
-              className="btn-dark  fixed sm:relative sm:bottom-0 sm:right-0 bottom-1 right-[0.5px] w-full sm:w-auto px-8"
+              className="btn-dark   s w-full sm:w-auto px-8"
             >
               Publish
             </button>
