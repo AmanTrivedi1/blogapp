@@ -10,26 +10,17 @@ import { IoIosNotificationsOutline } from "react-icons/io";
 import { UserContext } from '../App'
 
 const SideNav = () => {
-
-    let { userAuth:{access_token}} =  useContext(UserContext);
-
+    let { userAuth:{access_token , new_notification_available}} =  useContext(UserContext);
     let page = location.pathname.split("/")[2];
-
     let [pageState , setPageState] = useState(page.replace('-',''));
-
     let [showSideNav , setShowSidenav] = useState(false);
-
     let activeTabLine = useRef();
     let sideBarIconTab  = useRef();
     let pageStateTab= useRef();
-
-
     const changePageState = (e) =>{
-        
         let {offsetWidth , offsetLeft} = e.target; 
         activeTabLine.current.style.width=offsetWidth+"px";
         activeTabLine.current.style.left=offsetLeft+"px";
-
         if(e.target == sideBarIconTab.current){
            setShowSidenav(true) 
         } else{
@@ -40,8 +31,6 @@ const SideNav = () => {
       setShowSidenav(false);
       pageStateTab.current.click();
     },[pageState])
-
-
   return (
     access_token ===  null ? <Navigate to="/signin"  /> :  
     <>
@@ -67,8 +56,15 @@ const SideNav = () => {
                 <IoDocumentsOutline/>Blogs
               </NavLink>
 
-              <NavLink className="sidebar-link" to="/dashboard/notification" onClick={(e) => setPageState(e.target.innerText)}>
-              <IoIosNotificationsOutline/>  Notification
+              <NavLink className="sidebar-link " to="/dashboard/notifications" onClick={(e) => setPageState(e.target.innerText)}>
+                  <div className='relative'>
+                  {
+                    new_notification_available ? 
+                    <span className="bg-red z-10 top-0 r-0 w-2 h-2 rounded-full animate-ping absolute"></span> : " "
+                   }
+                   <IoIosNotificationsOutline/>  
+                  </div>
+                  Notifications
               </NavLink>
 
               <NavLink className="sidebar-link" to="/editor" onClick={(e) => setPageState(e.target.innerText)}>

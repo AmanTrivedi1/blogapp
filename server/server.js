@@ -440,18 +440,15 @@ server.post("/update-profile", vefifyJWT, async (req, res) => {
           instagram: "instagram.com",
           twitter: "twitter.com",
           github: "github.com",
-          website: "", // Allow empty website field
+          website: "", 
           facebook: "facebook.com"
       };
-
       for (let i = 0; i < socialLinksArr.length; i++) {
           if (social_links[socialLinksArr[i]] && social_links[socialLinksArr[i]].length > 0) {
-              // For website, check if it's not empty but don't require a URL format
+            
               if (socialLinksArr[i] === "website") {
                   continue;
               }
-
-              // Check if the social link is a valid key and contains the correct URL format with "https://"
               const link = social_links[socialLinksArr[i]];
               if (
                   !link.startsWith("https://") ||
@@ -462,16 +459,12 @@ server.post("/update-profile", vefifyJWT, async (req, res) => {
               }
           }
       }
-
-      // If all checks pass, update the profile
       let updateObj = {
           "personal_info.username": username,
           "personal_info.bio": bio,
           social_links
       };
-
       await User.findOneAndUpdate({ _id: req.user }, updateObj, { runValidators: true });
-
       res.status(200).json({ username });
   } catch (err) {
       if (err.code === 11000) {
@@ -483,13 +476,7 @@ server.post("/update-profile", vefifyJWT, async (req, res) => {
 });
 
 
-
-
-
 // For Creating the post
-
-
-
 
 
 server.post("/create-blog", vefifyJWT, (req, res) => {
@@ -671,6 +658,7 @@ server.post("/add-comment", vefifyJWT, (req, res) => {
       res.status(403), json({ error: "Write something to leave a comment..." })
     );
   }
+  
   let commentObj = new Comment({
     blog_id: _id,
     blog_author,
@@ -735,9 +723,107 @@ server.post("/get-blog-comments", (req, res) => {
 });
 
 
+const deleteComments = (_id) =>{
+  Comment.findOneAndDelete({_id}).then(comment=>{
+      if(comment.parent){
+        Comment.findOneAndUpdate({_id:comment.parent} , {$pull : {children:_id}}).then(data=>console.log("comment Deleted"))
+        .catch(err => console.log(err))
+      }
+      Notification.findOneAndDelete({comment :_id}).then(notification => console.log("Notification deleted"));
+      Notification.findOneAndUpdate({reply:_id} , {$unset: {reply :1}}).then(notification =>  console.log("Reply Notification deleted"));
+
+      Blog.findOneAndUpdate({_id:comment.blog_id} , {$pull:{comments:_id} , $inc:{"activity.total_comments" : -1} , "activity.total_parent_comments": comment.parent ? 0  : -1})
+      .then(blog=>{
+        if(comment.children.length){
+              comment.children.map(replies => {
+                deleteComments(replies);
+              })
+        }
+      })
+  }).catch(err=>{
+    console.log(err.message)
+  })
+}
+
+
+server.post("/delete-comment" , vefifyJWT , (req , res) => {
+  let user_id = req.user;
+  let{_id} = req.body;
+  Comment.findOne({_id}).then(comment => {
+    if(user_id == comment.commented_by || user_id == comment.blog_author) {
+
+      deleteComments(_id)
+
+      return res.status(200).json({status:"Done deleting"})
+    }else  {
+      return res.status(403).json({error : "You can not delete this comment"});
+    }
+  })
+})
+
+server.get("/new-notification" , vefifyJWT , (req , res) =>{
+
+  let user_id = req.user;
+
+ Notification.exists({notification_for : user_id , seen :false , user:{$ne:user_id}}).then(result=>{
+  if(result){
+    return res.status(200).json({new_notification_available:true})
+  }else {
+    return res.status(200).json({new_notification_available:false})
+  }
+ }).catch(err => {
+  console.log(err.message);
+  return res.status(500).json({error:err.message});
+ })
+})
 
 
 
+server.post("/notifications" , vefifyJWT , (req, res)=>{
+      let user_id= req.user;
+     
+      let {page , filter , deletedDocCount} = req.body;
+
+      let maxLimit = 10;
+
+      let findQuery = {notification_for: user_id , user:{ $ne:user_id }} ;
+
+      let skipDocs = (page - 1) * maxLimit;
+      
+      if(filter != "all") {
+         findQuery.type = filter;
+      }
+
+      if(deletedDocCount) {
+        skipDocs -= deletedDocCount;
+      }
+      Notification.find(findQuery).skip(skipDocs).limit(maxLimit). populate("blog", "title blog_id ").populate("user", "personal_info.fullname  personal_info.username personal_info.profile_img").populate("comment", "comment" ).populate("replied_on_comment" , "comment").populate("reply" , "comment").sort({createdAt:-1}).select("createdAt type  seen reply").then(notifications =>{
+        
+        Notification.updateMany(findQuery , {seen:true}).skip(skipDocs).limit(maxLimit).then(()=>{
+          console.log("Notification seen")
+        })
+        
+        return res.status(200).json({notifications})
+      } ).catch(err=> {
+        console.log(err.message);
+        return res.status(500).json({error : err.message})
+      })
+})
+
+server.post("/all-notification-count", vefifyJWT , (req, res)=>{
+    let user_id= req.user;
+    let {filter} = req.body;
+
+    let findQuery = {notification_for: user_id , user:{$ne:user_id}}
+    if(filter != "all"){
+      findQuery.type=filter;
+    }
+    Notification.countDocuments(findQuery).then(count => {
+      return res.status(200).json({totalDocs: count})
+    }).catch(err => {
+      return res.status(500).json({error:err.message})
+    })
+})
 
 
 

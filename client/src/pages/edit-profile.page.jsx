@@ -101,7 +101,7 @@ const EditProfile = () => {
         let loadingToast = toast.loading("Uploading...");
         e.target.setAttribute("disabled", true);
     
-        // Construct social_links object
+      
         let social_links = {
             youtube,
             instagram,
