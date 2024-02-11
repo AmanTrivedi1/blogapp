@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&family=Poppins:wght@200;300;400;500;600;700&display=swap");
 @import "@flaticon/flaticon-uicons/css/all/all";
+@import "./editor.theme.css";
 
 @tailwind base;
 @tailwind components;
@@ -25,7 +26,7 @@ font-family: 'Poppins', sans-serif; */
   }
 
   body {
-    @apply font-inter font-normal text-black;
+    @apply font-inter font-normal text-black bg-white;
   }
 
   i {

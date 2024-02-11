@@ -102,21 +102,21 @@ const BlogPage = () => {
             }}
           >
             <CommentsContainer />
-            <div className="bg-[#212121] min-h-screen">
+            <div className=" min-h-screen">
               <Link
-                className=" absolute top-10   p-2 rounded-full text-white/40  mt-5  left-10"
+                className=" absolute top-10   p-2 rounded-full   mt-5  left-10"
                 to="/"
               >
                 <FaArrowLeft />
               </Link>
-              <div className="max-w-[900px] text-white center py-10 max-lg:px-[5vw] ">
+              <div className="max-w-[900px]  center py-10 max-lg:px-[5vw] ">
                 <img
                   src={banner}
                   className="aspect-video rounded-lg"
                   alt="banner img"
                 />
                 <div className="mt-12 ">
-                  <h1 className="capitalize text-white text-3xl line-clamp-2 ">
+                  <h1 className="capitalize  text-3xl line-clamp-2 ">
                     {title}
                   </h1>
                   <div className="flex max-sm:flex-col justify-between my-8 ">
@@ -126,19 +126,19 @@ const BlogPage = () => {
                         src={profile_img}
                         alt="profileimage"
                       />
-                      <p className="text-white capitalize line-clamp-1">
+                      <p className=" capitalize line-clamp-1">
                         {fullname}
                       </p>
                       <br />
                       <Link
-                        className="text-white/50 underline line-clamp-1 "
+                        className=" underline line-clamp-1 "
                         to={`/user/${author_username}`}
                       >
                         @{author_username}
                       </Link>
                     </div>
                   </div>
-                  <p className="text-dark-grey opacity-90  max-sm:mt-6 max-sm:ml-12 max-sm:pl-5 ">
+                  <p className=" opacity-90  max-sm:mt-6 max-sm:ml-12 max-sm:pl-5 ">
                     Published on {getDay(publishedAt)}
                   </p>
                 </div>
@@ -154,7 +154,7 @@ const BlogPage = () => {
                   })}
                 </div>
                 {similarBlog != null && similarBlog.length ? (
-                  <h1 className="text-3xl font-bold mb-10 mt-20 text-white">
+                  <h1 className="text-3xl font-bold mb-10 mt-20 ">
                     Similar Blog's
                   </h1>
                 ) : (

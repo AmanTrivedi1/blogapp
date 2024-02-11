@@ -4,14 +4,19 @@ import { AiOutlineSearch } from "react-icons/ai";
 import { BsPencilFill } from "react-icons/bs";
 import { BiBell } from "react-icons/bi";
 import logo from "../imgs/logo.png";
-import { UserContext } from "../App";
+import { ThemeContext, UserContext } from "../App";
 import { useNavigate } from "react-router-dom";
 import UserNavigationPanel from "./user-navigation.component";
 import axios from "axios";
+import { storeInSession } from "../common/session";
 
 const Navbar = () => {
   const [searchBoxVisibility, setSearchBoxVisibility] = useState(false);
   const [userNavPanel, setUserNavPanel] = useState(false);
+
+
+  let { theme , setTheme } = useContext(ThemeContext)
+
 
   const navigate = useNavigate();
   const handleUserNavPannel = () => {
@@ -48,6 +53,20 @@ const Navbar = () => {
       navigate(`/search/${query}`);
     }
   };
+
+
+  const changeTheme = () => {
+     let newTheme = theme == "light" ? "dark":"light"
+     setTheme(newTheme);
+
+     document.body.setAttribute("data-theme",newTheme);
+
+     storeInSession("theme",newTheme);
+
+     
+  }
+ 
+
 
   console.log(new_notification_available)
 
@@ -101,6 +120,18 @@ const Navbar = () => {
             <BsPencilFill />
             <p>Write</p>
           </Link>
+
+
+            {
+
+            }
+
+             <button onClick={changeTheme} className="w-12 h-12 rounded-full hover:bg-black/10 bg-grey relative">   
+                <i className={"fi fi-rr-" + (theme=="light" ? "moon-stars" : "sun" +" text-2xl block mt-2") }/>
+             </button>
+
+
+
           {access_token ? (
             <>
               <Link to="/dashboard/notifications">

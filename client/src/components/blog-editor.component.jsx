@@ -6,13 +6,16 @@ import AnimationWrapper from "../common/page-animation";
 import { uploadImage } from "../common/aws";
 import { EditorContext } from "../pages/editor.pages";
 import EditorJS from "@editorjs/editorjs";
-import Banner from "../../src/imgs/blog banner.png";
+import lightBanner  from "../../src/imgs/light.png";
+import darkBanner from "../../src/imgs/dark.png";
 import { tools } from "./tools.component";
 import axios from "axios";
-import { UserContext } from "../App";
+import { ThemeContext, UserContext } from "../App";
 
 const BlogEditor = () => {
   let navigate = useNavigate();
+
+  let {theme} = useContext(ThemeContext)
 
   let { blog_id } = useParams();
 
@@ -72,10 +75,33 @@ const BlogEditor = () => {
     setBlog({ ...blog, title: input.value });
   };
 
+
+
+
+
+
+
+
+
+
+
+
   const handleError = (e) => {
     let img = e.target;
-    img.src = Banner;
+    img.src = theme == "light" ? lightBanner : darkBanner
   };
+
+
+
+
+
+
+
+
+
+
+
+
 
   let {
     userAuth: { access_token },
@@ -140,7 +166,7 @@ const BlogEditor = () => {
             toast.dismiss(loadingToast);
             toast.success("Wo hooo blog is Saved👍");
             setTimeout(() => {
-              navigate("/dashboard/blogs?tab=draft");
+              navigate("/");
             }, 500);
           })
           .catch(({ response }) => {
@@ -176,12 +202,9 @@ const BlogEditor = () => {
           <div className="mx-auto max-w-[900px] w-full">
             <div className="relative border-dotted aspect-video rounded-xl hover:opacity-90 hover:cursor-pointer bg-white border-4 border-black/20">
               <label htmlFor="uploadBanner">
-                <h1 className="absolute font-bold bg-dark-grey p-1 rounded-md mt-2 text-white top-[10px] left-[14px] ">
-                  Dummy Image Upload Yours
-                </h1>
                 <img
                   src={banner}
-                  alt="/banner"
+                  alt="/img"
                   className="z-20 rounded-2xl p-2"
                   onError={handleError}
                 />
@@ -196,8 +219,8 @@ const BlogEditor = () => {
             </div>
             <textarea
               defaultValue={title}
-              className="text-3xl mt-10 leading-tight placeholder:opacity-60
-              font-medium w-full h-20 outline-none resize-none"
+              className="text-3xl  bg-white  mt-10 leading-tight placeholder:opacity-60
+             font-medium w-full h-20 outline-none resize-none"
               placeholder="Blog Title"
               onKeyDown={handleTitleKeydown}
               onChange={handleTitleChange}
