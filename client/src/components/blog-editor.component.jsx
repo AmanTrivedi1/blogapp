@@ -88,7 +88,7 @@ const BlogEditor = () => {
 
   const handleError = (e) => {
     let img = e.target;
-    img.src = theme == "light" ? lightBanner : darkBanner
+    img.src = theme == "light" ? "https://res.cloudinary.com/dmlts9lbk/image/upload/v1707690624/pexels-photo-5727109_yz5bgm.jpg" : "https://res.cloudinary.com/dmlts9lbk/image/upload/v1707690710/pexels-pixabay-315191_rubijx.jpg"
   };
 
 
