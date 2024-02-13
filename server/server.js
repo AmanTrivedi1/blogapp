@@ -271,7 +271,7 @@ server.post("/change-password", vefifyJWT , (req, res)=>{
 
 server.post("/latest-blogs", (req, res) => {
   let { page } = req.body;
-  let maxLimit = 5;
+  let maxLimit = 10;
   Blog.find({ draft: false })
     .populate(
       "author",
