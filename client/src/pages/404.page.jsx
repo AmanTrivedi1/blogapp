@@ -1,32 +1,20 @@
 import React from "react";
 import AnimationWrapper from "../common/page-animation";
-
-import Logo from "../imgs/logo.png";
 import { Link } from "react-router-dom";
 const NotFound = () => {
   return (
     <>
       <AnimationWrapper>
-        <div className="h-screen  flex flex-col items-center justify-center">
-          <h1 className="md:text-[300px] text-center sm:text-[200px]  text-[140px] text-dark font-bold">
-            404
-          </h1>
-          <p className="mt-[-40px] mb-4  text-center text-xl">
-            The page are you lookig for does not exists
-          </p>
-          <Link to="/" className="btn-dark">
+        <div className="flex p-2 mt-20 flex-col h-full items-center justify-center">
+           <div className="flex items-center justify-center flex-col">
+            <img className="max-w-sm animate-bounce " src="https://res.cloudinary.com/dmlts9lbk/image/upload/v1705598420/empty_u3jzi3.png" alt="notfound" />
+             <h1 className="md:text-[300px]   sm:text-[200px] text-[160px] -mt-[160px]  font-bold ">
+                404
+             </h1>
+           </div>
+          <Link to="/" className="btn-dark md:-mt-[80px] -mt-[40px]">
             Go home
           </Link>
-
-          <div className="flex mt-20 items-center flex-col justify-center">
-            <img
-              className="h-8 object-contain block mx-auto select-none"
-              src={Logo}
-              alt="logo"
-            />
-            <p className="text-2xl font-bold">Blogapp</p>
-            <p>Millions of story we read here</p>
-          </div>
         </div>
       </AnimationWrapper>
     </>

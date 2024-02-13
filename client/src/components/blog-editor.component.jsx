@@ -20,7 +20,7 @@ const BlogEditor = () => {
   let { blog_id } = useParams();
 
   let {
-    blog,
+    blog ={},
     blog: { title, banner, content, tags, des },
     setBlog,
     textEditor,

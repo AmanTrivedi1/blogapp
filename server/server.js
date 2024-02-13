@@ -857,11 +857,8 @@ server.post("/user-written-blogs-count", vefifyJWT , (req, res) => {
 })
 
 
-
-
 server.post("/delete-blog" , vefifyJWT , (req, res)=>{
 
-  
   let user_id = req.user;
   let {blog_id}= req.body;
 
@@ -877,8 +874,6 @@ server.post("/delete-blog" , vefifyJWT , (req, res)=>{
   })
 
 })
-
-
 
 server.listen(PORT, () => {
   console.log("Listening on " + PORT + "  wohooooo 😄😄👲👲");
