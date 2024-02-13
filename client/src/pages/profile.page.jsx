@@ -111,7 +111,7 @@ const ProfilePage = () => {
 
   const resetStates = () => {
     setProfile(profileDataStructure);
-    // setBlogs(null);
+    setBlogs(null);
     setLoading(false);
     setProfileLoaded("");
   };
@@ -120,10 +120,7 @@ const ProfilePage = () => {
     return (
       <>
         <div className="md:w-[90%] md:mt-7 flex  items-center  flex-col justify-center md:justify-start md:items-start  ">
-          <p className="text-xl leading-7 ">
-            {bio.length ? bio : "nothing to read here"}
-          </p>
-          <div className="flex gap-2">
+          <div className="flex gap-2 mt-2 mb-2">
             {facebook ? (
               <Link to={facebook} target="_blank">
                 <CiFacebook className="text-3xl text-[#3b5998]" />
@@ -168,10 +165,22 @@ const ProfilePage = () => {
               <></>
             )}
           </div>
-          <div className="text-xl left-7 text-dark-grey">
+          <div className="text-xl text-bold left-7 text-dark-grey">
             Joined on {getFullDay(joinedAt)}
           </div>
         </div>
+        <div className="flex gap-4 mt-2">
+                {profileId == username ? (
+                  <Link
+                    to="setting/edit-profile"
+                    className="  mt-2 mb-2 bg-white text-black rounded-md"
+                  >
+                    Edit Profile
+                  </Link>
+                ) : (
+                  <></>
+                )}
+      </div>
       </>
     );
   };
@@ -179,42 +188,39 @@ const ProfilePage = () => {
   const AboutUser = () => {
     return (
       <>
-        <div className="md:w-[90%] md:mt-20  hidden sm:flex  items-center  flex-col justify-center md:justify-start md:items-start  ">
-          <p className="text-xl leading-7 ">
-            {bio.length ? bio : "nothing to read here"}
-          </p>
-          <div className="flex gap-2">
+        <div className="  ">
+          <div className="flex gap-2 mt-2 mb-2">
             {facebook ? (
               <Link to={facebook} target="_blank">
-                <CiFacebook className="text-3xl text-[#3b5998]" />
+                <CiFacebook className="text-3xl " />
               </Link>
             ) : (
               <></>
             )}
             {github ? (
               <Link to={github} target="_blank">
-                <FaGithubAlt className="text-3xl text-[#24292e]" />
+                <FaGithubAlt className="text-3xl " />
               </Link>
             ) : (
               <></>
             )}
             {instagram ? (
               <Link to={instagram} target="_blank">
-                <FaInstagram className="text-3xl text-[#d62976]" />
+                <FaInstagram className="text-3xl " />
               </Link>
             ) : (
               <></>
             )}
             {website ? (
               <Link to={website} target="_blank">
-                <MdBlurLinear className="text-3xl text-[#000000]" />
+                <MdBlurLinear className="text-3xl " />
               </Link>
             ) : (
               <></>
             )}
             {twitter ? (
               <Link to={twitter} target="_blank">
-                <FaXTwitter className="text-3xl text-[#00acee]" />
+                <FaXTwitter className="text-3xl " />
               </Link>
             ) : (
               <></>
@@ -222,7 +228,7 @@ const ProfilePage = () => {
 
             {youtube ? (
               <Link to={youtube} target="_blank">
-                <FaYoutube className="text-3xl text-[#CD201F] " />
+                <FaYoutube className="text-3xl  " />
               </Link>
             ) : (
               <></>
@@ -232,6 +238,18 @@ const ProfilePage = () => {
             Joined on {getFullDay(joinedAt)}
           </div>
         </div>
+        <div className="flex  text-bold gap-4 mt-2">
+                {profileId == username ? (
+                  <Link
+                    to="setting/edit-profile"
+                    className="  mt-2 mb-2 bg-white text-black rounded-md"
+                  >
+                    Edit Profile
+                  </Link>
+                ) : (
+                  <></>
+                )}
+              </div>
       </>
     );
   };
@@ -244,30 +262,29 @@ const ProfilePage = () => {
           <Loader />
         ) : profile_username.length ? (
           <section className="h-cover md:flex flex-row-reverse items-start gap-5 min-[1100px]:gap-12">
-            <div className="flex flex-col max-md:items-center gap-5 min-w-[250px] md:w-[50%] md:pl-8  md:border-l border-grey md:sticky md:-[100px] md:py-10">
-              <img
-                src={profile_img}
-                alt="profileimf"
-                className="w-48 h-48 rounded-full md:w-32 md:h-32"
-              />
-              <h1 className="text-2xl font-medium">@{profile_username}</h1>
-              <p className="text-xl capitalize h-6">{fullname}</p>
-              <p>
-                {total_posts?.toLocaleString()} Blogs -{" "}
-                {total_reads?.toLocaleString()} Reads
-              </p>
-              <div className="flex gap-4 mt-2">
-                {profileId == username ? (
-                  <Link
-                    to="setting/edit-profile"
-                    className="btn-light rounded-md"
-                  >
-                    Edit Profile
-                  </Link>
-                ) : (
-                  <></>
-                )}
+            <div className="flex flex-col   min-w-[250px] md:w-[50%] md:pl-8  md:border-l border-grey md:sticky md:-[100px] md:py-10">
+              <div className="flex items-center gap-x-20 ">
+                <div>
+                  <img
+                  src={profile_img}
+                  alt="profileimf"
+                  className="w-20 h-20 rounded-full "
+                 />
+                </div>
+                <div className="flex gap-x-20">
+                  <div className=" flex flex-col justify-center items-center">
+                    <p>{total_posts?.toLocaleString()}</p>
+                    <p>TotalBlogs</p>
+                  </div>
+                 <div className="flex flex-col justify-center items-center">
+                   <p>{total_reads?.toLocaleString()} </p> 
+                   <p>TotalReads</p>
+                 </div>
+                </div>
               </div>
+              <p className="text-xl mt-4 capitalize ">{fullname}</p>
+              <h1 className=" text-lg mb-1 font-medium">@{profile_username}</h1>
+              <p className="text-lg"> {bio.length ? bio : "nothing to read here"}</p>
               <AboutUser />
             </div>
             <div className="max-md:mt-12 w-full">

@@ -2,11 +2,21 @@ import React, { useContext } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { EditorContext } from "../pages/editor.pages";
 const Tag = ({ tag, tagIndex }) => {
+
+  
   let {
     blog,
     blog: { tags },
     setBlog,
   } = useContext(EditorContext);
+
+
+
+    if (!blog || !blog.tags) {
+      return null; 
+    }
+
+
   const handleDeletingTag = () => {
     tags = tags.filter((t) => t != tag);
     setBlog({ ...blog, tags });

@@ -73,12 +73,12 @@ const Navbar = () => {
   return (
     <>
       <nav className="navbar background  z-50">
-        <Link to="/" className="flex-none w-10 font-bold text-xl  " herf="/">
-          <img src={logo} alt="Icon" className="w-full" />
+        <Link to="/"  >
+          <img src={logo} alt="Icon" className="max-w-[60px]" />
         </Link>
      
         <div
-          className="absolute background hidden md:block  w-full left-0 top-full mt-0.5  py-4 px-[5vw] md:relative
+          className="absolute background hidden md:block  w-full left-0 top-full mt-0.5  py-4 px-[3vw] md:relative
                 md:inset-0 md:p-0 md:w-auto "
         >
           <input

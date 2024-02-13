@@ -36,11 +36,11 @@ export const ManagePublishBlogCard = ({blog}) => {
 
   return (
     <>
-    <div className='flex    gap-10 border-b mb-6 max-md:px-4 hover border-grey pb-6 items-center'>
-        <img  src={banner} className=' w-28 h-28 flex-none rounded-full bg-grey object-cover ' alt="img" />
-        <div className='flex flex-col justify-between py-2 w-full min-w-[300px]'>
+    <div className='flex    gap-10 border-b mb-6 max-md:px-4 hover overflow-hidden border-grey pb-6 items-center'>
+        <img  src={banner} className=' w-20 h-20 flex-none rounded-full bg-grey object-cover ' alt="img" />
+        <div className='flex flex-col  py-2 w-full min-w-[300px]'>
           <div className=''>
-            <Link  className='blog-title mb-4 hover:underline' to={`/blog/${blog_id}`}>{title}</Link>
+               <Link  className='blog-title line-clamp-1 mb-4 hover:underline' to={`/blog/${blog_id}`}>{title}</Link>
             <p className='line-clamp-1 text-sm text-dark-grey'>Published on {getDay(publishedAt)}</p>
             <div className='flex gap-6 mt-3'>
                <Link  className='underline pr-4 py-2'  to={`/editor/${blog_id}`}>Edit</Link>
@@ -75,7 +75,10 @@ export const ManageDraftBlogPost =({blog  }) =>{
     <div className='flex gap-5 lg:gap-10 pb-6 border-b mb-6 border-grey'>
     <h1 className='blog-index text-center pl-4 mb:pl-6 flex-none'>{index < 10 ? "0" + index: index}</h1>
      <div>
-        <h1 className='blog-title mb-3 line-clamp-1'>{title}</h1>
+        <div className='max-w-xs truncate'>
+          <h1 className='blog-title mb-3 line-clamp-1'>{title}</h1>
+        </div>
+   
         <p className=''>{des?.length ? des: "No Description provided"}</p>
 
         <div className='flex gap-6 mt-3'>
