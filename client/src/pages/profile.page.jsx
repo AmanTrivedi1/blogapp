@@ -169,18 +169,7 @@ const ProfilePage = () => {
             Joined on {getFullDay(joinedAt)}
           </div>
         </div>
-        <div className="flex gap-4 mt-2">
-                {profileId == username ? (
-                  <Link
-                    to="setting/edit-profile"
-                    className="  mt-2 mb-2 bg-white text-black rounded-md"
-                  >
-                    Edit Profile
-                  </Link>
-                ) : (
-                  <></>
-                )}
-      </div>
+    
       </>
     );
   };
@@ -238,18 +227,7 @@ const ProfilePage = () => {
             Joined on {getFullDay(joinedAt)}
           </div>
         </div>
-        <div className="flex  text-bold gap-4 mt-2">
-                {profileId == username ? (
-                  <Link
-                    to="setting/edit-profile"
-                    className="  mt-2 mb-2 bg-white text-black rounded-md"
-                  >
-                    Edit Profile
-                  </Link>
-                ) : (
-                  <></>
-                )}
-              </div>
+      
       </>
     );
   };
